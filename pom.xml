@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2016 Regents of the University of Minnesota - All Rights Reserved
+  ~ Unauthorized Copying of this file, via any medium is strictly prohibited
+  ~ Proprietary and Confidential
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>edu.umn.biomedicus</groupId>
+    <artifactId>biomedicus-gpl</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <biomedicus.version>1.6.0-SNAPSHOT</biomedicus.version>
+    </properties>
+
+    <version>${biomedicus.version}</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>edu.umn.biomedicus</groupId>
+            <artifactId>biomedicus-core</artifactId>
+            <version>${biomedicus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.umn.biomedicus</groupId>
+            <artifactId>biomedicus-uima</artifactId>
+            <version>${biomedicus.version}</version>
+        </dependency>
+    </dependencies>
+
+    <organization>
+        <name>University of Minnesota Institute for Health Informatics NLP/IE Program</name>
+        <url>http://www.bmhi.umn.edu/ihi/research/nlpie/index.htm</url>
+    </organization>
+    <developers>
+        <developer>
+            <name>Ben Knoll</name>
+            <email>benknoll@umn.edu</email>
+            <organization>NLP/IE Group at the University of Minnesota Institute for Health Informatics
+            </organization>
+            <organizationUrl>http://www.bmhi.umn.edu/ihi/research/nlpie/index.htm</organizationUrl>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>GNU General Public License, Version 3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/NLPIE/BioMedICUS</url>
+        <connection>scm:git:https://github.com/NLPIE/BioMedICUS.git</connection>
+        <developerConnection>scm:git:https://github.com/NLPIE/BioMedICUS.git</developerConnection>
+    </scm>
+
+</project>
