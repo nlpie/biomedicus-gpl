@@ -30,7 +30,7 @@ import weka.attributeSelection.AttributeSelection;
 import weka.attributeSelection.InfoGainAttributeEval;
 import weka.attributeSelection.Ranker;
 import weka.classifiers.Classifier;
-import weka.classifiers.bayes.NaiveBayesMultinomial;
+import weka.classifiers.functions.SMO;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
@@ -91,7 +91,7 @@ public class SeverityClassifierTrainer implements PostProcessor {
     @Override
     public void afterProcessing() throws BiomedicusException {
         Instances trainSet = wekaProcessor.getTrainingData();
-        Classifier classifier = new NaiveBayesMultinomial();
+        Classifier classifier = new SMO();
         AttributeSelection sel = new AttributeSelection();
         ASEvaluation infogain = new InfoGainAttributeEval();
         Ranker ranker = new Ranker();

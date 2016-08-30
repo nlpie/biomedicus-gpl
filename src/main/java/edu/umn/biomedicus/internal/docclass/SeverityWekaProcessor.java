@@ -40,6 +40,11 @@ class SeverityWekaProcessor implements Serializable {
     // Build this incrementally with each added document
     private Instances trainingTextInstances;
 
+    // de-weight instances in the 'absent' and 'mild' classes to deal with sparsity issues
+    private final double[] byClassWeights = {1, .3, 3, 3};
+
+    private final List<String> classValues;
+
     private final boolean sortWordsByDescendingFreq;
     private final int minTermCount;
     private final Set<String> stopWords;
@@ -67,7 +72,7 @@ class SeverityWekaProcessor implements Serializable {
         this.minTermCount = minTermCount;
 
         ArrayList<Attribute> textInstanceAttributes = new ArrayList<>();
-        List<String> classValues = Arrays.asList("ABSENT", "MILD", "MODERATE", "SEVERE", SeverityClassifierModel.UNK);
+        classValues = Arrays.asList("ABSENT", "MILD", "MODERATE", "SEVERE", SeverityClassifierModel.UNK);
         classAttribute = new Attribute("_class", classValues);
         textInstanceAttributes.add(classAttribute);
         textInstanceAttributes.add(new Attribute("text", (List<String>) null));
@@ -119,6 +124,7 @@ class SeverityWekaProcessor implements Serializable {
     private Instance getTextInstance(String docText) {
         String fileText;
         String docClass;
+        double weight = 1;
         Matcher matcher = fileTextPattern.matcher(docText);
         if(matcher.find()) {
             fileText = matcher.group(1);
@@ -127,8 +133,8 @@ class SeverityWekaProcessor implements Serializable {
         }
         fileText = processText(fileText);
         matcher = scorePattern.matcher(docText);
-        if(matcher.find()) {
-            docClass = matcher.group(1);
+        if(matcher.find() && classValues.contains(docClass = matcher.group(1))) {
+            weight *= byClassWeights[classValues.indexOf(docClass)];
         } else {
             docClass = SeverityClassifierModel.UNK;
             if(dictionary == null) {
@@ -140,6 +146,9 @@ class SeverityWekaProcessor implements Serializable {
         matcher = annotatedBy.matcher(docText);
         if(matcher.find()) {
             fileText += " thisNoteAnnotatedBy" + matcher.group(1);
+            if (matcher.group(1).equals("1")) {
+                weight /= 2;
+            }
         }
 
         Instance inst = new DenseInstance(2);
@@ -147,6 +156,7 @@ class SeverityWekaProcessor implements Serializable {
         inst.setValue(0, docClass);
         inst.attribute(1).addStringValue(fileText);
         inst.setValue(1, fileText);
+        inst.setWeight(weight);
         return inst;
     }
 
@@ -275,7 +285,9 @@ class SeverityWekaProcessor implements Serializable {
                 counts[dictionary.get(uni) + 1]++;
             }
         }
-        return new SparseInstance(1, counts);
+        Instance vec = new SparseInstance(1, counts);
+        vec.setWeight(textInstance.weight());
+        return vec;
     }
 
 }

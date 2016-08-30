@@ -75,6 +75,7 @@ public class SeverityClassifierModel implements Serializable {
 
     /**
      * Perform attribute selection and then classification using the stored Weka objects
+     * Where classes are tied, err on the side of higher class
      * @param document the document
      * @return a string (from the predefined classes) representing this document's symptom severity
      * @throws BiomedicusException
@@ -85,7 +86,15 @@ public class SeverityClassifierModel implements Serializable {
         try {
             if(attSel.input(inst)) {
                 inst = attSel.output();
-                result = classifier.classifyInstance(inst);
+                double[] dist = classifier.distributionForInstance(inst);
+                result=-1;
+                double max=-Double.MAX_VALUE;
+                for(int i=0; i<dist.length; i++) {
+                    if (dist[i] >= max) {
+                        max = dist[i];
+                        result = i;
+                    }
+                }
             } else {
                 throw new Exception();
             }
