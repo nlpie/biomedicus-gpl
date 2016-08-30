@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2016 Regents of the University of Minnesota - All Rights Reserved
-  ~ Unauthorized Copying of this file, via any medium is strictly prohibited
-  ~ Proprietary and Confidential
+  ~ Copyright (C) 2016 Regents of the University of Minnesota
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -11,13 +22,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.umn.biomedicus</groupId>
     <artifactId>biomedicus-gpl</artifactId>
-    <packaging>pom</packaging>
+    <version>1.6.0-SNAPSHOT</version>
+
+    <name>biomedicus-gpl</name>
+    <description>BioMedICUS Annotation System - GPL Extensions</description>
 
     <properties>
         <biomedicus.version>1.6.0-SNAPSHOT</biomedicus.version>
     </properties>
-
-    <version>${biomedicus.version}</version>
 
     <dependencies>
         <dependency>
@@ -30,7 +42,65 @@
             <artifactId>biomedicus-uima</artifactId>
             <version>${biomedicus.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>nz.ac.waikato.cms.weka</groupId>
+            <artifactId>weka-stable</artifactId>
+            <version>3.8.0</version>
+        </dependency>
     </dependencies>
+
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/*.xml</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.2</version>
+                <executions>
+                    <execution>
+                        <id>make-bundles</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <descriptors>
+                                <descriptor>src/assembly/descriptor.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <organization>
         <name>University of Minnesota Institute for Health Informatics NLP/IE Program</name>
@@ -47,7 +117,7 @@
     </developers>
     <licenses>
         <license>
-            <name>GNU General Public License, Version 3.0</name>
+            <name>GNU General Public License, Version 3.0 (GPLv3)</name>
             <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
             <distribution>repo</distribution>
         </license>

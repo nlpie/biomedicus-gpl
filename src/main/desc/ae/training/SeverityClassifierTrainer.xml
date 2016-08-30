@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Regents of the University of Minnesota
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<analysisEngineDescription xmlns="http://uima.apache.org/resourceSpecifier">
+    <frameworkImplementation>org.apache.uima.java</frameworkImplementation>
+    <primitive>true</primitive>
+    <!-- Do not change this -->
+    <annotatorImplementationName>
+        edu.umn.biomedicus.uima.adapter.DocumentProcessorRunnerAnnotator
+    </annotatorImplementationName>
+    <!-- Biomedicus document processors are all run using the DocumentProcessorRunnerAnnotator -->
+    <analysisEngineMetaData>
+        <name>Severity Trainer</name>
+        <description>Trains the severity classification model.</description>
+        <version>${project.version}</version>
+        <vendor>${organization.name}</vendor>
+        <configurationParameters>
+            <configurationParameter>
+                <name>docclass.severity.model.path</name>
+                <description>Where to write the model to.</description>
+                <type>String</type>
+                <mandatory>false</mandatory>
+            </configurationParameter>
+            <configurationParameter>
+                <name>docclass.stopwords.path</name>
+                <description>Location of stopwords file</description>
+                <type>String</type>
+                <mandatory>false</mandatory>
+            </configurationParameter>
+            <configurationParameter>
+                <name>documentProcessor</name>
+                <description>The document processor class to instantiate.</description>
+                <type>String</type>
+                <mandatory>true</mandatory>
+            </configurationParameter>
+            <configurationParameter>
+                <name>docclass.severity.attributesToKeep</name>
+                <description>The number of attributes to keep.</description>
+                <type>Integer</type>
+                <mandatory>true</mandatory>
+            </configurationParameter>
+            <configurationParameter>
+                <name>docclass.severity.minWordCount</name>
+                <description>Minimum word count</description>
+                <type>Integer</type>
+                <mandatory>true</mandatory>
+            </configurationParameter>
+            <configurationParameter>
+                <name>viewName</name>
+                <description>The name of the UIMA view to use.</description>
+                <type>String</type>
+            </configurationParameter>
+            <configurationParameter>
+                <name>eagerLoad</name>
+                <description>
+                    The name of any classes that need to be eagerly loaded by the Guice injector. Classes which are
+                    instances of LoadableDataModel will have the loadData method called.
+                </description>
+                <type>String</type>
+                <multiValued>true</multiValued>
+                <mandatory>false</mandatory>
+            </configurationParameter>
+            <configurationParameter>
+                <name>postProcessors</name>
+                <description>
+                    The class names of any post processors that should be run after all documents have been processed.
+                </description>
+                <type>String</type>
+                <multiValued>true</multiValued>
+                <mandatory>false</mandatory>
+            </configurationParameter>
+        </configurationParameters>
+        <configurationParameterSettings>
+            <nameValuePair>
+                <name>docclass.severity.attributesToKeep</name>
+                <value>
+                    <integer>1000</integer>
+                </value>
+            </nameValuePair>
+            <nameValuePair>
+                <name>docclass.severity.minWordCount</name>
+                <value>
+                    <integer>2</integer>
+                </value>
+            </nameValuePair>
+            <nameValuePair>
+                <name>documentProcessor</name>
+                <value>
+                    <string>edu.umn.biomedicus.internal.docclass.SeverityTrainerProcessor</string>
+                </value>
+            </nameValuePair>
+            <nameValuePair>
+                <name>viewName</name>
+                <value>
+                    <string>SystemView</string>
+                </value>
+            </nameValuePair>
+            <nameValuePair>
+                <name>postProcessors</name>
+                <value>
+                    <array>
+                        <string>edu.umn.biomedicus.internal.docclass.SeverityClassifierTrainer</string>
+                    </array>
+                </value>
+            </nameValuePair>
+        </configurationParameterSettings>
+        <typeSystemDescription>
+            <imports>
+                <import name="edu.umn.biomedicus.types.TypeSystem"/>
+            </imports>
+        </typeSystemDescription>
+        <typePriorities>
+            <imports>
+                <import name="edu.umn.biomedicus.types.TypeSystemTypePriorities"/>
+            </imports>
+        </typePriorities>
+        <operationalProperties>
+            <modifiesCas>false</modifiesCas>
+            <multipleDeploymentAllowed>false</multipleDeploymentAllowed>
+            <outputsNewCASes>false</outputsNewCASes>
+        </operationalProperties>
+    </analysisEngineMetaData>
+
+    <externalResourceDependencies>
+        <externalResourceDependency>
+            <key>guiceInjector</key>
+            <description>The guice injector resource.</description>
+        </externalResourceDependency>
+    </externalResourceDependencies>
+
+    <resourceManagerConfiguration>
+        <externalResources>
+            <externalResource>
+                <name>guiceInjector</name>
+                <description>The guice resource.</description>
+                <customResourceSpecifier>
+                    <resourceClassName>edu.umn.biomedicus.uima.adapter.GuiceInjector</resourceClassName>
+                </customResourceSpecifier>
+            </externalResource>
+        </externalResources>
+        <externalResourceBindings>
+            <externalResourceBinding>
+                <key>guiceInjector</key>
+                <resourceName>guiceInjector</resourceName>
+            </externalResourceBinding>
+        </externalResourceBindings>
+    </resourceManagerConfiguration>
+</analysisEngineDescription>
+
