@@ -1,0 +1,8 @@
+settings:
+  docclass:
+    stopwords.path: NOT_USED
+    severity:
+      output.path: docclass/severityModel.ser
+      model.path: docclass/severityModel.ser
+      attributesToKeep: 1000
+      minWordCount: 2

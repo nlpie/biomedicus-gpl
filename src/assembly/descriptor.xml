@@ -43,13 +43,6 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>src/main/amq</directory>
-            <outputDirectory>amq</outputDirectory>
-            <includes>
-                <include>**/*</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>src/main/config</directory>
             <outputDirectory>config</outputDirectory>
             <includes>
@@ -68,6 +61,13 @@
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>**/*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>.</directory>
+            <includes>
+                <include>LICENSE.txt</include>
+                <include>README.md</include>
             </includes>
         </fileSet>
     </fileSets>
