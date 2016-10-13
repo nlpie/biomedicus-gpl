@@ -6,3 +6,5 @@ settings:
       model.path: docclass/severityModel.ser
       attributesToKeep: 1000
       minWordCount: 2
+  stanford:
+    srParser.path: englishSR.ser.gz

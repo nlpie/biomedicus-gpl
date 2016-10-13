@@ -22,12 +22,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>edu.umn.biomedicus</groupId>
     <artifactId>biomedicus-gpl</artifactId>
+    <packaging>jar</packaging>
     <version>1.6.0-SNAPSHOT</version>
 
     <name>biomedicus-gpl</name>
     <description>BioMedICUS Annotation System - GPL Extensions</description>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <biomedicus.version>1.6.0-SNAPSHOT</biomedicus.version>
     </properties>
 
@@ -41,6 +44,11 @@
             <groupId>edu.umn.biomedicus</groupId>
             <artifactId>biomedicus-uima</artifactId>
             <version>${biomedicus.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>3.6.0</version>
         </dependency>
         <dependency>
             <groupId>nz.ac.waikato.cms.weka</groupId>
@@ -85,7 +93,6 @@
                         </goals>
                         <phase>package</phase>
                         <configuration>
-                            <appendAssemblyId>false</appendAssemblyId>
                             <descriptors>
                                 <descriptor>src/assembly/descriptor.xml</descriptor>
                             </descriptors>
