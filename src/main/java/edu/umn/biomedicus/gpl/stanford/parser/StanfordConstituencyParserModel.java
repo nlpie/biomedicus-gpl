@@ -31,7 +31,6 @@ import edu.umn.biomedicus.common.types.syntax.PartOfSpeech;
 import edu.umn.biomedicus.common.types.syntax.PartsOfSpeech;
 import edu.umn.biomedicus.common.types.text.ConstituencyParse;
 import edu.umn.biomedicus.common.types.text.ParseToken;
-import edu.umn.biomedicus.common.types.text.Sentence;
 import edu.umn.biomedicus.exc.BiomedicusException;
 
 import javax.inject.Inject;

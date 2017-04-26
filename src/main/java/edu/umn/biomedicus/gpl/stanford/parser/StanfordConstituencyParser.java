@@ -18,12 +18,12 @@
 package edu.umn.biomedicus.gpl.stanford.parser;
 
 import edu.umn.biomedicus.application.DocumentProcessor;
+import edu.umn.biomedicus.application.TextView;
 import edu.umn.biomedicus.common.labels.Label;
 import edu.umn.biomedicus.common.labels.LabelIndex;
 import edu.umn.biomedicus.common.labels.Labeler;
 import edu.umn.biomedicus.common.types.syntax.PartOfSpeech;
 import edu.umn.biomedicus.common.types.text.ConstituencyParse;
-import edu.umn.biomedicus.common.types.text.Document;
 import edu.umn.biomedicus.common.types.text.ParseToken;
 import edu.umn.biomedicus.common.types.text.Sentence;
 import edu.umn.biomedicus.exc.BiomedicusException;
@@ -38,7 +38,7 @@ public class StanfordConstituencyParser implements DocumentProcessor {
     private final StanfordConstituencyParserModel stanfordConstituencyParserModel;
 
     @Inject
-    public StanfordConstituencyParser(Document document,
+    public StanfordConstituencyParser(TextView document,
                                       StanfordConstituencyParserModel stanfordConstituencyParserModel) {
         sentenceLabelIndex = document.getLabelIndex(Sentence.class);
         parseTokenLabelIndex = document.getLabelIndex(ParseToken.class);

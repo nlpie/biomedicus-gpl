@@ -21,7 +21,7 @@ import com.google.inject.Inject;
 import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
 import edu.umn.biomedicus.application.PostProcessor;
-import edu.umn.biomedicus.common.types.text.Document;
+import edu.umn.biomedicus.application.TextView;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +86,7 @@ public class SeverityClassifierTrainer implements PostProcessor {
      * Add the document to the collection, which will be trained all at once at the end
      * @param document a document
      */
-    public void processDocument(Document document) {
+    public void processDocument(TextView document) {
         wekaProcessor.addTrainingDocument(document);
     }
 

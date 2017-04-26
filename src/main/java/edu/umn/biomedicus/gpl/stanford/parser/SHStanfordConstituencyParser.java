@@ -18,13 +18,13 @@
 package edu.umn.biomedicus.gpl.stanford.parser;
 
 import edu.umn.biomedicus.application.DocumentProcessor;
+import edu.umn.biomedicus.application.TextView;
 import edu.umn.biomedicus.common.labels.Label;
 import edu.umn.biomedicus.common.labels.LabelIndex;
 import edu.umn.biomedicus.common.labels.Labeler;
 import edu.umn.biomedicus.common.types.semantics.SocialHistoryCandidate;
 import edu.umn.biomedicus.common.types.syntax.PartOfSpeech;
 import edu.umn.biomedicus.common.types.text.ConstituencyParse;
-import edu.umn.biomedicus.common.types.text.Document;
 import edu.umn.biomedicus.common.types.text.ParseToken;
 import edu.umn.biomedicus.exc.BiomedicusException;
 
@@ -38,7 +38,7 @@ public class SHStanfordConstituencyParser implements DocumentProcessor {
     private final LabelIndex<SocialHistoryCandidate> socialHistoryCandidateLabelIndex;
 
     @Inject
-    public SHStanfordConstituencyParser(Document document,
+    SHStanfordConstituencyParser(TextView document,
                                         StanfordConstituencyParserModel stanfordConstituencyParserModel) {
         socialHistoryCandidateLabelIndex = document.getLabelIndex(SocialHistoryCandidate.class);
         parseTokenLabelIndex = document.getLabelIndex(ParseToken.class);
