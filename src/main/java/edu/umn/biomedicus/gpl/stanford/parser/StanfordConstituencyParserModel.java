@@ -30,6 +30,7 @@ import edu.umn.biomedicus.common.labels.Labeler;
 import edu.umn.biomedicus.common.types.syntax.PartOfSpeech;
 import edu.umn.biomedicus.common.types.syntax.PartsOfSpeech;
 import edu.umn.biomedicus.common.types.text.ConstituencyParse;
+import edu.umn.biomedicus.common.types.text.ImmutableConstituencyParse;
 import edu.umn.biomedicus.common.types.text.ParseToken;
 import edu.umn.biomedicus.exc.BiomedicusException;
 
@@ -43,36 +44,44 @@ import java.util.List;
 @Singleton
 @ProvidedBy(StanfordConstituencyParserModel.Loader.class)
 public class StanfordConstituencyParserModel {
-    private final ShiftReduceParser shiftReduceParser;
+    private final ShiftReduceParser srParser;
 
-    private StanfordConstituencyParserModel(ShiftReduceParser shiftReduceParser) {
-        this.shiftReduceParser = shiftReduceParser;
+    private StanfordConstituencyParserModel(ShiftReduceParser srParser) {
+        this.srParser = srParser;
     }
 
     void parseSentence(Label<?> sentenceLabel,
                        LabelIndex<ParseToken> parseTokenLabelIndex,
                        LabelIndex<PartOfSpeech> partOfSpeechLabelIndex,
-                       Labeler<ConstituencyParse> constituencyParseLabeler) throws BiomedicusException {
+                       Labeler<ConstituencyParse> constituencyParseLabeler)
+            throws BiomedicusException {
         List<TaggedWord> taggedWordList = new ArrayList<>();
-        for (Label<ParseToken> parseTokenLabel : parseTokenLabelIndex.insideSpan(sentenceLabel)) {
+        for (Label<ParseToken> parseTokenLabel : parseTokenLabelIndex
+                .insideSpan(sentenceLabel)) {
             String word = parseTokenLabel.value().text();
-            PartOfSpeech partOfSpeech = partOfSpeechLabelIndex.withTextLocation(parseTokenLabel)
-                    .orElseThrow(() -> new BiomedicusException("parse token did not have part of speech."))
+            PartOfSpeech partOfSpeech = partOfSpeechLabelIndex
+                    .withTextLocation(parseTokenLabel)
+                    .orElseThrow(() -> new BiomedicusException(
+                            "parse token did not have part of speech."))
                     .value();
 
-            TaggedWord taggedWord = new TaggedWord(word, PartsOfSpeech.tagForPartOfSpeech(partOfSpeech));
+            TaggedWord taggedWord = new TaggedWord(word,
+                    PartsOfSpeech.tagForPartOfSpeech(partOfSpeech));
             taggedWordList.add(taggedWord);
         }
-        Tree tree = shiftReduceParser.apply(taggedWordList);
+        Tree tree = srParser.apply(taggedWordList);
         StringWriter stringWriter = new StringWriter();
-        tree.pennPrint(new PrintWriter(stringWriter));
+        PrintWriter pw = new PrintWriter(stringWriter);
+        tree.pennPrint(pw);
         String pennPrint = stringWriter.toString();
-        ConstituencyParse constituencyParse = new ConstituencyParse(pennPrint);
+        ConstituencyParse constituencyParse = ImmutableConstituencyParse
+                .builder().parse(pennPrint).build();
         constituencyParseLabeler.value(constituencyParse).label(sentenceLabel);
     }
 
     @Singleton
-    public static class Loader extends DataLoader<StanfordConstituencyParserModel> {
+    public static class Loader
+            extends DataLoader<StanfordConstituencyParserModel> {
         private final Path path;
 
         @Inject
@@ -81,8 +90,10 @@ public class StanfordConstituencyParserModel {
         }
 
         @Override
-        protected StanfordConstituencyParserModel loadModel() throws BiomedicusException {
-            ShiftReduceParser shiftReduceParser = ShiftReduceParser.loadModel(path.toString());
+        protected StanfordConstituencyParserModel loadModel()
+                throws BiomedicusException {
+            ShiftReduceParser shiftReduceParser = ShiftReduceParser
+                    .loadModel(path.toString());
             return new StanfordConstituencyParserModel(shiftReduceParser);
         }
     }
