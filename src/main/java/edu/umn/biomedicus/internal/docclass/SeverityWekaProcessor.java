@@ -17,6 +17,7 @@
 
 package edu.umn.biomedicus.internal.docclass;
 
+import edu.umn.biomedicus.framework.store.Document;
 import edu.umn.biomedicus.framework.store.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,10 +95,10 @@ class SeverityWekaProcessor implements Serializable {
 
     /**
      * Add a document for training. Will extract this doc's text but will not train on it until getTrainingData called
-     * @param document a document
+     * @param textView a document
      */
-    void addTrainingDocument(TextView document) {
-        Instance trainingInstance = getTextInstance(document.getText());
+    void addTrainingDocument(TextView textView) {
+        Instance trainingInstance = getTextInstance(textView.getText());
         if (trainingInstance != null) {
             trainingTextInstances.add(trainingInstance);
         }
@@ -105,11 +106,11 @@ class SeverityWekaProcessor implements Serializable {
 
     /**
      * Convert a document into a vector instance. buildDictionary() needs to have been run.
-     * @param document a document
+     * @param textView a document
      * @return an Instance with real-valued data
      */
-    Instance getTestData(TextView document) {
-        Instance textInstance = getTextInstance(document.getText());
+    Instance getTestData(TextView textView) {
+        Instance textInstance = getTextInstance(textView.getText());
         Instance vectorInstance = vectorizeInstance(textInstance);
         vectorInstance.setDataset(vectorTemplate);
         return vectorInstance;

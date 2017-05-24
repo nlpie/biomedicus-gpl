@@ -18,29 +18,28 @@
 package edu.umn.biomedicus.internal.docclass;
 
 import com.google.inject.Inject;
-import edu.umn.biomedicus.framework.store.Document;
-import edu.umn.biomedicus.framework.DocumentProcessor;
-import edu.umn.biomedicus.framework.store.TextView;
 import edu.umn.biomedicus.exc.BiomedicusException;
+import edu.umn.biomedicus.framework.DocumentProcessor;
+import edu.umn.biomedicus.framework.store.Document;
+import edu.umn.biomedicus.framework.store.TextView;
 
 public class SeverityClassifier implements DocumentProcessor {
 
-    private final SeverityClassifierModel severityClassifierModel;
-    private final TextView textView;
-    private final Document document;
+  private final SeverityClassifierModel severityClassifierModel;
+  private final Document document;
+  private final TextView textView;
 
-    @Inject
-    public SeverityClassifier(SeverityClassifierModel severityClassifierModel,
-                              TextView textView,
-                              Document document) {
-        this.severityClassifierModel = severityClassifierModel;
-        this.textView = textView;
-        this.document = document;
-    }
+  @Inject
+  public SeverityClassifier(SeverityClassifierModel severityClassifierModel, Document document,
+      TextView textView) {
+    this.severityClassifierModel = severityClassifierModel;
+    this.document = document;
+    this.textView = textView;
+  }
 
-    @Override
-    public void process() throws BiomedicusException {
-        String prediction = severityClassifierModel.predict(textView);
-        document.putMetadata("Severity", prediction);
-    }
+  @Override
+  public void process() throws BiomedicusException {
+    String prediction = severityClassifierModel.predict(textView);
+    document.putMetadata("Severity", prediction);
+  }
 }

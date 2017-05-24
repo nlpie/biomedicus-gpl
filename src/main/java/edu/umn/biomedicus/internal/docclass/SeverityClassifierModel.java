@@ -21,9 +21,9 @@ import com.google.inject.Inject;
 import com.google.inject.ProvidedBy;
 import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
+import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DataLoader;
 import edu.umn.biomedicus.framework.store.TextView;
-import edu.umn.biomedicus.exc.BiomedicusException;
 import weka.classifiers.Classifier;
 import weka.core.Instance;
 import weka.filters.Filter;
@@ -76,12 +76,12 @@ public class SeverityClassifierModel implements Serializable {
     /**
      * Perform attribute selection and then classification using the stored Weka objects
      * Where classes are tied, err on the side of higher class
-     * @param document the document
-     * @return a string (from the predefined classes) representing this document's symptom severity
+     * @param textView the textView
+     * @return a string (from the predefined classes) representing this textView's symptom severity
      * @throws BiomedicusException
      */
-    public String predict(TextView document) throws BiomedicusException {
-        Instance inst = severityWekaProcessor.getTestData(document);
+    public String predict(TextView textView) throws BiomedicusException {
+        Instance inst = severityWekaProcessor.getTestData(textView);
         double result;
         try {
             if(attSel.input(inst)) {

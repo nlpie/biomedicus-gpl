@@ -20,9 +20,10 @@ package edu.umn.biomedicus.internal.docclass;
 import com.google.inject.Inject;
 import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
-import edu.umn.biomedicus.framework.PostProcessor;
-import edu.umn.biomedicus.framework.store.TextView;
 import edu.umn.biomedicus.exc.BiomedicusException;
+import edu.umn.biomedicus.framework.PostProcessor;
+import edu.umn.biomedicus.framework.store.Document;
+import edu.umn.biomedicus.framework.store.TextView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.attributeSelection.ASEvaluation;
@@ -84,10 +85,10 @@ public class SeverityClassifierTrainer implements PostProcessor {
 
     /**
      * Add the document to the collection, which will be trained all at once at the end
-     * @param document a document
+     * @param textView a document
      */
-    public void processDocument(TextView document) {
-        wekaProcessor.addTrainingDocument(document);
+    public void processDocument(TextView textView) {
+        wekaProcessor.addTrainingDocument(textView);
     }
 
     @Override

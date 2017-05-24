@@ -17,41 +17,44 @@
 
 package edu.umn.biomedicus.gpl.stanford.parser;
 
-import edu.umn.biomedicus.framework.DocumentProcessor;
-import edu.umn.biomedicus.framework.store.TextView;
-import edu.umn.biomedicus.framework.store.Label;
-import edu.umn.biomedicus.framework.store.LabelIndex;
-import edu.umn.biomedicus.framework.store.Labeler;
 import edu.umn.biomedicus.common.types.semantics.SocialHistoryCandidate;
 import edu.umn.biomedicus.common.types.syntax.PartOfSpeech;
 import edu.umn.biomedicus.common.types.text.ConstituencyParse;
 import edu.umn.biomedicus.common.types.text.ParseToken;
 import edu.umn.biomedicus.exc.BiomedicusException;
-
+import edu.umn.biomedicus.framework.DocumentProcessor;
+import edu.umn.biomedicus.framework.store.Document;
+import edu.umn.biomedicus.framework.store.Label;
+import edu.umn.biomedicus.framework.store.LabelIndex;
+import edu.umn.biomedicus.framework.store.Labeler;
+import edu.umn.biomedicus.framework.store.TextView;
 import javax.inject.Inject;
 
 public class SHStanfordConstituencyParser implements DocumentProcessor {
-    private final LabelIndex<PartOfSpeech> partOfSpeechLabelIndex;
-    private final Labeler<ConstituencyParse> constituencyParseLabeler;
-    private final LabelIndex<ParseToken> parseTokenLabelIndex;
-    private final StanfordConstituencyParserModel stanfordConstituencyParserModel;
-    private final LabelIndex<SocialHistoryCandidate> socialHistoryCandidateLabelIndex;
 
-    @Inject
-    SHStanfordConstituencyParser(TextView document,
-                                        StanfordConstituencyParserModel stanfordConstituencyParserModel) {
-        socialHistoryCandidateLabelIndex = document.getLabelIndex(SocialHistoryCandidate.class);
-        parseTokenLabelIndex = document.getLabelIndex(ParseToken.class);
-        partOfSpeechLabelIndex = document.getLabelIndex(PartOfSpeech.class);
-        constituencyParseLabeler = document.getLabeler(ConstituencyParse.class);
-        this.stanfordConstituencyParserModel = stanfordConstituencyParserModel;
-    }
+  private final LabelIndex<PartOfSpeech> partOfSpeechLabelIndex;
+  private final Labeler<ConstituencyParse> constituencyParseLabeler;
+  private final LabelIndex<ParseToken> parseTokenLabelIndex;
+  private final StanfordConstituencyParserModel stanfordConstituencyParserModel;
+  private final LabelIndex<SocialHistoryCandidate> labelIndex;
 
-    @Override
-    public void process() throws BiomedicusException {
-        for (Label<SocialHistoryCandidate> socialHistoryCandidateLabel : socialHistoryCandidateLabelIndex) {
-            stanfordConstituencyParserModel.parseSentence(socialHistoryCandidateLabel, parseTokenLabelIndex,
-                    partOfSpeechLabelIndex, constituencyParseLabeler);
-        }
+  @Inject
+  public SHStanfordConstituencyParser(
+      TextView textView,
+      StanfordConstituencyParserModel stanfordConstituencyParserModel
+  ) {
+    labelIndex = textView.getLabelIndex(SocialHistoryCandidate.class);
+    parseTokenLabelIndex = textView.getLabelIndex(ParseToken.class);
+    partOfSpeechLabelIndex = textView.getLabelIndex(PartOfSpeech.class);
+    constituencyParseLabeler = textView.getLabeler(ConstituencyParse.class);
+    this.stanfordConstituencyParserModel = stanfordConstituencyParserModel;
+  }
+
+  @Override
+  public void process() throws BiomedicusException {
+    for (Label<SocialHistoryCandidate> label : labelIndex) {
+      stanfordConstituencyParserModel.parseSentence(label, parseTokenLabelIndex,
+          partOfSpeechLabelIndex, constituencyParseLabeler);
     }
+  }
 }

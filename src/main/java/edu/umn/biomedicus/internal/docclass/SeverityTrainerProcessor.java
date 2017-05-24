@@ -18,22 +18,22 @@
 package edu.umn.biomedicus.internal.docclass;
 
 import com.google.inject.Inject;
+import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DocumentProcessor;
 import edu.umn.biomedicus.framework.store.TextView;
-import edu.umn.biomedicus.exc.BiomedicusException;
 
 public class SeverityTrainerProcessor implements DocumentProcessor {
     private final SeverityClassifierTrainer severityClassifierTrainer;
-    private final TextView document;
+    private final TextView textView;
 
     @Inject
-    public SeverityTrainerProcessor(SeverityClassifierTrainer severityClassifierTrainer, TextView document) {
+    public SeverityTrainerProcessor(SeverityClassifierTrainer severityClassifierTrainer, TextView textView) {
         this.severityClassifierTrainer = severityClassifierTrainer;
-        this.document = document;
+        this.textView = textView;
     }
 
     @Override
     public void process() throws BiomedicusException {
-        severityClassifierTrainer.processDocument(document);
+        severityClassifierTrainer.processDocument(textView);
     }
 }
