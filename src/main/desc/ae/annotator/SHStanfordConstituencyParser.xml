@@ -67,7 +67,7 @@
             <nameValuePair>
                 <name>documentProcessor</name>
                 <value>
-                    <string>edu.umn.biomedicus.gpl.stanford.parser.StanfordConstituencyParser</string>
+                    <string>edu.umn.biomedicus.gpl.stanford.parser.SHStanfordConstituencyParser</string>
                 </value>
             </nameValuePair>
             <nameValuePair>
