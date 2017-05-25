@@ -7,7 +7,9 @@ The system is being developed by our biomedical NLP/IE program at the University
 This is a collaborative project that aims to serve biomedical and clinical researchers, allowing for customization
 with different texts.
 
-This project is a collection of GPL-licensed extensions and utilities for the BioMedICUS system.
+This project is a collection of GPL-licensed extensions and utilities for the BioMedICUS system. 
+Any extensions or use of the BioMedICUS project with this extension installed must be compliant with
+the GPLv3 license.
 
 
 Wiki
