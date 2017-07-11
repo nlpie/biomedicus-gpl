@@ -51,7 +51,7 @@ public class SHStanfordConstituencyParser implements DocumentProcessor {
   }
 
   @Override
-  public void process() throws BiomedicusException {
+  public void process(Document document) throws BiomedicusException {
     for (Label<SocialHistoryCandidate> label : labelIndex) {
       stanfordConstituencyParserModel.parseSentence(label, parseTokenLabelIndex,
           partOfSpeechLabelIndex, constituencyParseLabeler);

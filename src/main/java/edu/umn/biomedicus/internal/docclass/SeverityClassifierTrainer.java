@@ -20,10 +20,19 @@ package edu.umn.biomedicus.internal.docclass;
 import com.google.inject.Inject;
 import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
+import edu.umn.biomedicus.common.StandardViews;
 import edu.umn.biomedicus.exc.BiomedicusException;
-import edu.umn.biomedicus.framework.PostProcessor;
+import edu.umn.biomedicus.framework.Aggregator;
 import edu.umn.biomedicus.framework.store.Document;
 import edu.umn.biomedicus.framework.store.TextView;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.attributeSelection.ASEvaluation;
@@ -36,15 +45,6 @@ import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
-import javax.annotation.Nullable;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
  * Train a Weka model to classify documents according to symptom severity
  * Created for the 2016 i2b2 NLP Shared Task
@@ -52,78 +52,79 @@ import java.util.stream.Collectors;
  * @author Greg Finley
  */
 @ProcessorScoped
-public class SeverityClassifierTrainer implements PostProcessor {
+public class SeverityClassifierTrainer implements Aggregator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SeverityClassifierTrainer.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SeverityClassifierTrainer.class);
 
-    private final Path outPath;
-    private final SeverityWekaProcessor wekaProcessor;
-    private final int attributesToKeep;
+  private final Path outPath;
+  private final SeverityWekaProcessor wekaProcessor;
+  private final int attributesToKeep;
 
-    /**
-     * Initialize this trainer. If the stopwords file is not present or can't be read from, trainer will still work
-     * @param outPath the path to write the model to
-     * @param stopWordsPath path to a stopwords file
-     */
-    @Inject
-    public SeverityClassifierTrainer(@ProcessorSetting("docclass.severity.output.path") Path outPath,
-                                     @ProcessorSetting("docclass.stopwords.path") @Nullable Path stopWordsPath,
-                                     @ProcessorSetting("docclass.severity.attributesToKeep") Integer attributesToKeep,
-                                     @ProcessorSetting("docclass.severity.minWordCount") Integer minWordCount) {
-        Set<String> stopWords = null;
-        if(stopWordsPath != null) {
-            try {
-                stopWords = Files.lines(stopWordsPath).collect(Collectors.toSet());
-            } catch (IOException e) {
-                LOGGER.warn("Could not load stopwords file; will not exclude stopwords");
-            }
-        }
-        this.outPath = outPath;
-        this.attributesToKeep = attributesToKeep;
-        wekaProcessor = new SeverityWekaProcessor(stopWords, minWordCount, true);
+  /**
+   * Initialize this trainer. If the stopwords file is not present or can't be read from, trainer
+   * will still work
+   *
+   * @param outPath the path to write the model to
+   * @param stopWordsPath path to a stopwords file
+   */
+  @Inject
+  public SeverityClassifierTrainer(@ProcessorSetting("docclass.severity.output.path") Path outPath,
+      @ProcessorSetting("docclass.stopwords.path") @Nullable Path stopWordsPath,
+      @ProcessorSetting("docclass.severity.attributesToKeep") Integer attributesToKeep,
+      @ProcessorSetting("docclass.severity.minWordCount") Integer minWordCount) {
+    Set<String> stopWords = null;
+    if (stopWordsPath != null) {
+      try {
+        stopWords = Files.lines(stopWordsPath).collect(Collectors.toSet());
+      } catch (IOException e) {
+        LOGGER.warn("Could not load stopwords file; will not exclude stopwords");
+      }
+    }
+    this.outPath = outPath;
+    this.attributesToKeep = attributesToKeep;
+    wekaProcessor = new SeverityWekaProcessor(stopWords, minWordCount, true);
+  }
+
+  @Override
+  public void addDocument(Document document) throws BiomedicusException {
+    TextView textView = document.getTextView(StandardViews.ORIGINAL_DOCUMENT)
+        .orElseThrow(() -> new BiomedicusException("No original document view"));
+    wekaProcessor.addTrainingDocument(textView);
+  }
+
+  @Override
+  public void done() throws BiomedicusException {
+    Instances trainSet = wekaProcessor.getTrainingData();
+    Classifier classifier = new SMO();
+    AttributeSelection sel = new AttributeSelection();
+    ASEvaluation infogain = new InfoGainAttributeEval();
+    Ranker ranker = new Ranker();
+    Remove remove = new Remove();
+
+    ranker.setNumToSelect(attributesToKeep);
+    sel.setEvaluator(infogain);
+    sel.setSearch(ranker);
+
+    try {
+      sel.SelectAttributes(trainSet);
+      int[] selected = sel.selectedAttributes();
+      remove.setInvertSelection(true);
+      remove.setAttributeIndicesArray(selected);
+      remove.setInputFormat(trainSet);
+      trainSet = Filter.useFilter(trainSet, remove);
+      classifier.buildClassifier(trainSet);
+    } catch (Exception e) {
+      throw new BiomedicusException();
     }
 
-    /**
-     * Add the document to the collection, which will be trained all at once at the end
-     * @param textView a document
-     */
-    public void processDocument(TextView textView) {
-        wekaProcessor.addTrainingDocument(textView);
+    SeverityClassifierModel model = new SeverityClassifierModel(classifier, remove, wekaProcessor);
+
+    try {
+      ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outPath.toFile()));
+      oos.writeObject(model);
+      oos.close();
+    } catch (IOException e) {
+      throw new BiomedicusException();
     }
-
-    @Override
-    public void afterProcessing() throws BiomedicusException {
-        Instances trainSet = wekaProcessor.getTrainingData();
-        Classifier classifier = new SMO();
-        AttributeSelection sel = new AttributeSelection();
-        ASEvaluation infogain = new InfoGainAttributeEval();
-        Ranker ranker = new Ranker();
-        Remove remove = new Remove();
-
-        ranker.setNumToSelect(attributesToKeep);
-        sel.setEvaluator(infogain);
-        sel.setSearch(ranker);
-
-        try {
-            sel.SelectAttributes(trainSet);
-            int[] selected = sel.selectedAttributes();
-            remove.setInvertSelection(true);
-            remove.setAttributeIndicesArray(selected);
-            remove.setInputFormat(trainSet);
-            trainSet = Filter.useFilter(trainSet, remove);
-            classifier.buildClassifier(trainSet);
-        } catch (Exception e) {
-            throw new BiomedicusException();
-        }
-
-        SeverityClassifierModel model = new SeverityClassifierModel(classifier, remove, wekaProcessor);
-
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outPath.toFile()));
-            oos.writeObject(model);
-            oos.close();
-        } catch(IOException e) {
-            throw new BiomedicusException();
-        }
-    }
+  }
 }

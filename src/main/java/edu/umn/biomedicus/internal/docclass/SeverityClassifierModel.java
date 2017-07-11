@@ -24,16 +24,15 @@ import edu.umn.biomedicus.annotations.ProcessorSetting;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DataLoader;
 import edu.umn.biomedicus.framework.store.TextView;
-import weka.classifiers.Classifier;
-import weka.core.Instance;
-import weka.filters.Filter;
-
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import weka.classifiers.Classifier;
+import weka.core.Instance;
+import weka.filters.Filter;
 
 /**
  * Classify documents based on symptom severity
@@ -43,93 +42,95 @@ import java.util.Map;
  */
 @ProvidedBy(SeverityClassifierModel.Loader.class)
 public class SeverityClassifierModel implements Serializable {
-    // For unknown classes (test data or poorly formatted training data)
-    static final String UNK = "unknown";
-    private final Classifier classifier;
-    private final Filter attSel;
-    private final SeverityWekaProcessor severityWekaProcessor;
 
-    private final Map<Double, String> severityMap;
+  // For unknown classes (test data or poorly formatted training data)
+  static final String UNK = "unknown";
+  private final Classifier classifier;
+  private final Filter attSel;
+  private final SeverityWekaProcessor severityWekaProcessor;
 
-    /**
-     * Initialize this model
-     * All training happens in the trainer; just store what we need to keep for classification
-     * @param classifier a Weka Classifier object
-     * @param attSel an attribute selection object
-     * @param severityWekaProcessor a processor to convert Document objects into Weka Instance objects
-     * @throws BiomedicusException
-     */
-    SeverityClassifierModel(Classifier classifier,
-                            Filter attSel,
-                            SeverityWekaProcessor severityWekaProcessor) throws BiomedicusException {
-        severityMap = new HashMap<>();
-        severityMap.put(0., "ABSENT");
-        severityMap.put(1., "MILD");
-        severityMap.put(2., "MODERATE");
-        severityMap.put(3., "SEVERE");
-        severityMap.put(4., UNK);
-        this.classifier = classifier;
-        this.attSel = attSel;
-        this.severityWekaProcessor = severityWekaProcessor;
-    }
+  private final Map<Double, String> severityMap;
 
-    /**
-     * Perform attribute selection and then classification using the stored Weka objects
-     * Where classes are tied, err on the side of higher class
-     * @param textView the textView
-     * @return a string (from the predefined classes) representing this textView's symptom severity
-     * @throws BiomedicusException
-     */
-    public String predict(TextView textView) throws BiomedicusException {
-        Instance inst = severityWekaProcessor.getTestData(textView);
-        double result;
-        try {
-            if(attSel.input(inst)) {
-                inst = attSel.output();
-                double[] dist = classifier.distributionForInstance(inst);
-                result=-1;
-                double max=-Double.MAX_VALUE;
-                for(int i=0; i<dist.length; i++) {
-                    if (dist[i] >= max) {
-                        max = dist[i];
-                        result = i;
-                    }
-                }
-            } else {
-                throw new Exception();
-            }
-        } catch(Exception e) {
-            throw new BiomedicusException();
+  /**
+   * Initialize this model
+   * All training happens in the trainer; just store what we need to keep for classification
+   *
+   * @param classifier a Weka Classifier object
+   * @param attSel an attribute selection object
+   * @param severityWekaProcessor a processor to convert Document objects into Weka Instance
+   * objects
+   */
+  SeverityClassifierModel(Classifier classifier,
+      Filter attSel,
+      SeverityWekaProcessor severityWekaProcessor) throws BiomedicusException {
+    severityMap = new HashMap<>();
+    severityMap.put(0., "ABSENT");
+    severityMap.put(1., "MILD");
+    severityMap.put(2., "MODERATE");
+    severityMap.put(3., "SEVERE");
+    severityMap.put(4., UNK);
+    this.classifier = classifier;
+    this.attSel = attSel;
+    this.severityWekaProcessor = severityWekaProcessor;
+  }
+
+  /**
+   * Perform attribute selection and then classification using the stored Weka objects
+   * Where classes are tied, err on the side of higher class
+   *
+   * @param textView the textView
+   * @return a string (from the predefined classes) representing this textView's symptom severity
+   */
+  public String predict(TextView textView) throws BiomedicusException {
+    Instance inst = severityWekaProcessor.getTestData(textView);
+    double result;
+    try {
+      if (attSel.input(inst)) {
+        inst = attSel.output();
+        double[] dist = classifier.distributionForInstance(inst);
+        result = -1;
+        double max = -Double.MAX_VALUE;
+        for (int i = 0; i < dist.length; i++) {
+          if (dist[i] >= max) {
+            max = dist[i];
+            result = i;
+          }
         }
-        return severityMap.get(result);
+      } else {
+        throw new Exception();
+      }
+    } catch (Exception e) {
+      throw new BiomedicusException();
+    }
+    return severityMap.get(result);
+  }
+
+  public String getMetadataKey() {
+    return "Severity";
+  }
+
+  /**
+   * Load a serialized model
+   */
+  @ProcessorScoped
+  static class Loader extends DataLoader<SeverityClassifierModel> {
+
+    private final Path modelPath;
+
+    @Inject
+    public Loader(@ProcessorSetting("docclass.severity.model.path") Path modelPath) {
+      this.modelPath = modelPath;
     }
 
-    public String getMetadataKey() {
-        return "Severity";
+    @Override
+    protected SeverityClassifierModel loadModel() throws BiomedicusException {
+      try {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelPath.toFile()));
+        return (SeverityClassifierModel) ois.readObject();
+      } catch (Exception e) {
+        throw new BiomedicusException();
+      }
     }
-
-    /**
-     * Load a serialized model
-     */
-    @ProcessorScoped
-    static class Loader extends DataLoader<SeverityClassifierModel> {
-
-        private final Path modelPath;
-
-        @Inject
-        public Loader(@ProcessorSetting("docclass.severity.model.path") Path modelPath) {
-            this.modelPath = modelPath;
-        }
-
-        @Override
-        protected SeverityClassifierModel loadModel() throws BiomedicusException {
-            try {
-                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(modelPath.toFile()));
-                return (SeverityClassifierModel) ois.readObject();
-            } catch(Exception e) {
-                throw new BiomedicusException();
-            }
-        }
-    }
+  }
 
 }
