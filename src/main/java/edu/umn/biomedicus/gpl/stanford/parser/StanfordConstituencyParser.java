@@ -23,6 +23,7 @@ import edu.umn.biomedicus.common.types.text.ParseToken;
 import edu.umn.biomedicus.common.types.text.Sentence;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DocumentProcessor;
+import edu.umn.biomedicus.framework.store.Document;
 import edu.umn.biomedicus.framework.store.Label;
 import edu.umn.biomedicus.framework.store.LabelIndex;
 import edu.umn.biomedicus.framework.store.Labeler;
@@ -48,7 +49,7 @@ public class StanfordConstituencyParser implements DocumentProcessor {
   }
 
   @Override
-  public void process() throws BiomedicusException {
+  public void process(Document document) throws BiomedicusException {
     for (Label<Sentence> sentenceLabel : sentenceLabelIndex) {
       stanfordConstituencyParserModel.parseSentence(sentenceLabel, parseTokenLabelIndex,
           partOfSpeechLabelIndex, constituencyParseLabeler);

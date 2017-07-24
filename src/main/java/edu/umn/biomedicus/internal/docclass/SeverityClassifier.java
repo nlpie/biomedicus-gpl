@@ -38,8 +38,8 @@ public class SeverityClassifier implements DocumentProcessor {
   }
 
   @Override
-  public void process() throws BiomedicusException {
+  public void process(Document document) throws BiomedicusException {
     String prediction = severityClassifierModel.predict(textView);
-    document.putMetadata("Severity", prediction);
+    this.document.putMetadata("Severity", prediction);
   }
 }
