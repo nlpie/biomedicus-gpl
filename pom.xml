@@ -23,7 +23,7 @@
   <groupId>edu.umn.biomedicus</groupId>
   <artifactId>biomedicus-gpl</artifactId>
   <packaging>jar</packaging>
-  <version>1.8.0</version>
+  <version>1.9.0-SNAPSHOT</version>
 
   <name>biomedicus-gpl</name>
   <description>BioMedICUS Annotation System - GPL Extensions</description>
@@ -31,7 +31,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <biomedicus.version>1.8.0</biomedicus.version>
+    <biomedicus.version>1.9.0-SNAPSHOT</biomedicus.version>
   </properties>
 
   <dependencies>
