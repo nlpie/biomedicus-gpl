@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Regents of the University of Minnesota
+ * Copyright (C) 2017 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DocumentProcessor;
 import edu.umn.biomedicus.framework.store.Document;
 import edu.umn.biomedicus.framework.store.TextView;
-import edu.umn.biomedicus.parsing.ConstituencyParse;
+import edu.umn.biomedicus.parsing.DependencyParse;
 import edu.umn.biomedicus.sh.SocialHistoryCandidate;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
@@ -31,18 +31,18 @@ import edu.umn.nlpengine.Labeler;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-public class SHStanfordConstituencyParser implements DocumentProcessor {
+public class SHStanfordDependencyParser implements DocumentProcessor {
 
-  private final StanfordConstituencyParserModel stanfordConstituencyParserModel;
+  private final StanfordDependencyParserModel model;
 
   private final String viewName;
 
   @Inject
-  public SHStanfordConstituencyParser(
-      StanfordConstituencyParserModel stanfordConstituencyParserModel,
+  public SHStanfordDependencyParser(
+      StanfordDependencyParserModel model,
       @ProcessorSetting("viewName") String viewName
   ) {
-    this.stanfordConstituencyParserModel = stanfordConstituencyParserModel;
+    this.model = model;
     this.viewName = viewName;
   }
 
@@ -55,16 +55,16 @@ public class SHStanfordConstituencyParser implements DocumentProcessor {
         SocialHistoryCandidate.class
     );
 
-    LabelIndex<ParseToken> parseTokenLabelIndex = view.getLabelIndex(ParseToken.class);
-    LabelIndex<PosTag> partOfSpeechLabelIndex = view.getLabelIndex(PosTag.class);
+    LabelIndex<ParseToken> tokens = view.getLabelIndex(ParseToken.class);
+    LabelIndex<PosTag> posTags = view.getLabelIndex(PosTag.class);
+    Labeler<DependencyParse> labeler = view.getLabeler(DependencyParse.class);
 
-    Labeler<ConstituencyParse> constituencyParseLabeler = view
-        .getLabeler(ConstituencyParse.class);
-
-
-    for (SocialHistoryCandidate label : candidates) {
-      stanfordConstituencyParserModel.parseSentence(label, parseTokenLabelIndex,
-          partOfSpeechLabelIndex, constituencyParseLabeler);
+    for (SocialHistoryCandidate candidate : candidates) {
+      String parse = model.parseSentence(
+          tokens.insideSpan(candidate).asList(),
+          posTags.insideSpan(candidate).asList()
+      );
+      labeler.add(new DependencyParse(candidate, parse));
     }
   }
 }

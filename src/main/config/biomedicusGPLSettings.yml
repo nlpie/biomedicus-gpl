@@ -8,3 +8,4 @@ settings:
       minWordCount: 2
   stanford:
     srParser.path: stanford/englishSR.ser.gz
+    depParserPath: stanford/english_SD.gz
