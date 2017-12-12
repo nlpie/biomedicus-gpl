@@ -25,10 +25,9 @@
   </annotatorImplementationName>
   <!-- Biomedicus document processors are all run using DocumentProcessorUimaAdapter -->
   <analysisEngineMetaData>
-    <name>Social History Stanford Depedency Parser</name>
+    <name>Social History Parser</name>
     <description>
-      Uses Stanford's neural network dependency parser to parse social history candidates for
-      dependencies.
+      Uses Stanford's constituency parser and dependency parser on social history candidates.
     </description>
     <version>${project.version}</version>
     <vendor>${organization.name}</vendor>
@@ -70,7 +69,7 @@
       <nameValuePair>
         <name>documentProcessor</name>
         <value>
-          <string>edu.umn.biomedicus.gpl.stanford.parser.SHStanfordDependencyParser</string>
+          <string>edu.umn.biomedicus.stanford.SHParser</string>
         </value>
       </nameValuePair>
       <nameValuePair>
@@ -83,6 +82,7 @@
         <name>eagerLoad</name>
         <value>
           <array>
+            <string>edu.umn.biomedicus.gpl.stanford.parser.StanfordConstituencyParserModel</string>
             <string>edu.umn.biomedicus.gpl.stanford.parser.StanfordDependencyParserModel</string>
           </array>
         </value>

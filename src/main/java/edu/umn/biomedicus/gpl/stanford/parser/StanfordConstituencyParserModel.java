@@ -30,7 +30,7 @@ import edu.umn.biomedicus.framework.DataLoader;
 import edu.umn.biomedicus.parsing.ConstituencyParse;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
-import edu.umn.nlpengine.Label;
+import edu.umn.nlpengine.TextRange;
 import edu.umn.nlpengine.LabelIndex;
 import edu.umn.nlpengine.Labeler;
 import java.io.PrintWriter;
@@ -50,8 +50,8 @@ public class StanfordConstituencyParserModel {
     this.shiftReduceParser = shiftReduceParser;
   }
 
-  void parseSentence(
-      Label sentenceLabel,
+  public void parseSentence(
+      TextRange sentenceLabel,
       LabelIndex<ParseToken> parseTokenLabelIndex,
       LabelIndex<PosTag> partOfSpeechLabelIndex,
       Labeler<ConstituencyParse> constituencyParseLabeler
