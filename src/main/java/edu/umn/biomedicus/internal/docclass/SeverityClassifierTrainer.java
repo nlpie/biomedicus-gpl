@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Regents of the University of Minnesota
+ * Copyright (C) 2018 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@ package edu.umn.biomedicus.internal.docclass;
 import com.google.inject.Inject;
 import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
-import edu.umn.biomedicus.common.StandardViews;
+import edu.umn.biomedicus.common.TextIdentifiers;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.Aggregator;
-import edu.umn.biomedicus.framework.store.Document;
-import edu.umn.biomedicus.framework.store.TextView;
+import edu.umn.nlpengine.Document;
+import edu.umn.nlpengine.LabeledText;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -87,9 +87,13 @@ public class SeverityClassifierTrainer implements Aggregator {
 
   @Override
   public void addDocument(Document document) throws BiomedicusException {
-    TextView textView = document.getTextView(StandardViews.ORIGINAL_DOCUMENT)
-        .orElseThrow(() -> new BiomedicusException("No original document view"));
-    wekaProcessor.addTrainingDocument(textView);
+    LabeledText labeledText = document.getLabeledTexts().get(TextIdentifiers.ORIGINAL_DOCUMENT);
+
+    if (labeledText == null) {
+      throw new BiomedicusException("Missing original document view");
+    }
+
+    wekaProcessor.addTrainingDocument(labeledText);
   }
 
   @Override

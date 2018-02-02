@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Regents of the University of Minnesota
+ * Copyright (C) 2018 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
 
 package edu.umn.biomedicus.gpl.stanford.parser;
 
-import edu.umn.biomedicus.common.StandardViews;
+import edu.umn.biomedicus.common.TextIdentifiers;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DocumentProcessor;
-import edu.umn.biomedicus.framework.store.Document;
-import edu.umn.biomedicus.framework.store.TextView;
+import edu.umn.nlpengine.Document;
+import edu.umn.nlpengine.LabeledText;
 import edu.umn.biomedicus.parsing.DependencyParse;
 import edu.umn.biomedicus.sentences.Sentence;
 import edu.umn.biomedicus.tagging.PosTag;
@@ -42,12 +42,12 @@ public class StanfordDependencyParser implements DocumentProcessor {
 
   @Override
   public void process(@Nonnull Document document) throws BiomedicusException {
-    TextView view = StandardViews.getSystemView(document);
+    LabeledText view = TextIdentifiers.getSystemLabeledText(document);
 
-    LabelIndex<Sentence> sentences = view.getLabelIndex(Sentence.class);
-    LabelIndex<ParseToken> tokens = view.getLabelIndex(ParseToken.class);
-    LabelIndex<PosTag> posTags = view.getLabelIndex(PosTag.class);
-    Labeler<DependencyParse> labeler = view.getLabeler(DependencyParse.class);
+    LabelIndex<Sentence> sentences = view.labelIndex(Sentence.class);
+    LabelIndex<ParseToken> tokens = view.labelIndex(ParseToken.class);
+    LabelIndex<PosTag> posTags = view.labelIndex(PosTag.class);
+    Labeler<DependencyParse> labeler = view.labeler(DependencyParse.class);
 
     for (Sentence sentence : sentences) {
       String parse = model.parseSentence(

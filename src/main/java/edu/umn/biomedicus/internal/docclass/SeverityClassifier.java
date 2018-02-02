@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Regents of the University of Minnesota
+ * Copyright (C) 2018 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,28 +18,25 @@
 package edu.umn.biomedicus.internal.docclass;
 
 import com.google.inject.Inject;
+import edu.umn.biomedicus.common.TextIdentifiers;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DocumentProcessor;
-import edu.umn.biomedicus.framework.store.Document;
-import edu.umn.biomedicus.framework.store.TextView;
+import edu.umn.nlpengine.Document;
+import edu.umn.nlpengine.LabeledText;
 
 public class SeverityClassifier implements DocumentProcessor {
 
   private final SeverityClassifierModel severityClassifierModel;
-  private final Document document;
-  private final TextView textView;
 
   @Inject
-  public SeverityClassifier(SeverityClassifierModel severityClassifierModel, Document document,
-      TextView textView) {
+  public SeverityClassifier(SeverityClassifierModel severityClassifierModel) {
     this.severityClassifierModel = severityClassifierModel;
-    this.document = document;
-    this.textView = textView;
   }
 
   @Override
   public void process(Document document) throws BiomedicusException {
-    String prediction = severityClassifierModel.predict(textView);
-    this.document.putMetadata("Severity", prediction);
+    LabeledText system = TextIdentifiers.getSystemLabeledText(document);
+    String prediction = severityClassifierModel.predict(system);
+    document.getMetadata().put("Severity", prediction);
   }
 }

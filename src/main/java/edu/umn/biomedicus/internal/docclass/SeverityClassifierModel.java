@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Regents of the University of Minnesota
+ * Copyright (C) 2018 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DataLoader;
-import edu.umn.biomedicus.framework.store.TextView;
+import edu.umn.nlpengine.LabeledText;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -78,11 +78,11 @@ public class SeverityClassifierModel implements Serializable {
    * Perform attribute selection and then classification using the stored Weka objects
    * Where classes are tied, err on the side of higher class
    *
-   * @param textView the textView
-   * @return a string (from the predefined classes) representing this textView's symptom severity
+   * @param labeledText the text
+   * @return a string (from the predefined classes) representing this text's symptom severity
    */
-  public String predict(TextView textView) throws BiomedicusException {
-    Instance inst = severityWekaProcessor.getTestData(textView);
+  public String predict(LabeledText labeledText) throws BiomedicusException {
+    Instance inst = severityWekaProcessor.getTestData(labeledText);
     double result;
     try {
       if (attSel.input(inst)) {

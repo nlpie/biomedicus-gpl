@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Regents of the University of Minnesota
+ * Copyright (C) 2018 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,17 +20,15 @@ package edu.umn.biomedicus.stanford
 import edu.umn.biomedicus.annotations.ProcessorSetting
 import edu.umn.biomedicus.exc.BiomedicusException
 import edu.umn.biomedicus.framework.DocumentProcessor
-import edu.umn.biomedicus.framework.store.Document
-import edu.umn.biomedicus.getLabelIndex
-import edu.umn.biomedicus.getLabeler
 import edu.umn.biomedicus.gpl.stanford.parser.StanfordConstituencyParserModel
 import edu.umn.biomedicus.gpl.stanford.parser.StanfordDependencyParserModel
 import edu.umn.biomedicus.parsing.ConstituencyParse
 import edu.umn.biomedicus.parsing.DependencyParse
 import edu.umn.biomedicus.sentences.Sentence
-import edu.umn.biomedicus.sh.SmokingCandidate
+import edu.umn.biomedicus.sh.NicotineCandidate
 import edu.umn.biomedicus.tagging.PosTag
 import edu.umn.biomedicus.tokenization.ParseToken
+import edu.umn.nlpengine.Document
 import javax.inject.Inject
 
 class SHParser @Inject constructor(
@@ -39,18 +37,17 @@ class SHParser @Inject constructor(
         @ProcessorSetting("viewName") val viewName: String
 ) : DocumentProcessor {
     override fun process(document: Document) {
-        val view = document.getTextView(viewName)
-                .orElseThrow { BiomedicusException("View not found: " + viewName) }
+        val view = document.labeledTexts[viewName] ?: throw BiomedicusException("View not found: " + viewName)
 
-        val sentences = view.getLabelIndex(Sentence::class)
+        val sentences = view.labelIndex(Sentence::class)
 
-        val parseTokens = view.getLabelIndex(ParseToken::class)
-        val posTags = view.getLabelIndex(PosTag::class)
+        val parseTokens = view.labelIndex(ParseToken::class)
+        val posTags = view.labelIndex(PosTag::class)
 
-        val smokingCandidates = view.getLabelIndex(SmokingCandidate::class)
+        val smokingCandidates = view.labelIndex(NicotineCandidate::class)
 
-        val dependencyParseLabeler = view.getLabeler(DependencyParse::class)
-        val constituencyParseLabeler = view.getLabeler(ConstituencyParse::class)
+        val dependencyParseLabeler = view.labeler(DependencyParse::class)
+        val constituencyParseLabeler = view.labeler(ConstituencyParse::class)
 
         for (sentence in sentences) {
             if (smokingCandidates.containsSpan(sentence)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Regents of the University of Minnesota
+ * Copyright (C) 2018 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 package edu.umn.biomedicus.internal.docclass;
 
-import edu.umn.biomedicus.framework.store.TextView;
+import edu.umn.nlpengine.LabeledText;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,10 +110,10 @@ class SeverityWekaProcessor implements Serializable {
    * Add a document for training. Will extract this doc's text but will not train on it until
    * getTrainingData called
    *
-   * @param textView a document
+   * @param labeledText a document
    */
-  void addTrainingDocument(TextView textView) {
-    Instance trainingInstance = getTextInstance(textView.getText());
+  void addTrainingDocument(LabeledText labeledText) {
+    Instance trainingInstance = getTextInstance(labeledText.getText());
     if (trainingInstance != null) {
       trainingTextInstances.add(trainingInstance);
     }
@@ -122,11 +122,11 @@ class SeverityWekaProcessor implements Serializable {
   /**
    * Convert a document into a vector instance. buildDictionary() needs to have been run.
    *
-   * @param textView a document
+   * @param labeledText a document
    * @return an Instance with real-valued data
    */
-  Instance getTestData(TextView textView) {
-    Instance textInstance = getTextInstance(textView.getText());
+  Instance getTestData(LabeledText labeledText) {
+    Instance textInstance = getTextInstance(labeledText.getText());
     Instance vectorInstance = vectorizeInstance(textInstance);
     vectorInstance.setDataset(vectorTemplate);
     return vectorInstance;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Regents of the University of Minnesota
+ * Copyright (C) 2018 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ package edu.umn.biomedicus.gpl.stanford.parser;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DocumentProcessor;
-import edu.umn.biomedicus.framework.store.Document;
-import edu.umn.biomedicus.framework.store.TextView;
+import edu.umn.nlpengine.Document;
+import edu.umn.nlpengine.LabeledText;
 import edu.umn.biomedicus.parsing.ConstituencyParse;
 import edu.umn.biomedicus.sentences.Sentence;
 import edu.umn.biomedicus.tagging.PosTag;
@@ -46,13 +46,16 @@ public class StanfordConstituencyParser implements DocumentProcessor {
 
   @Override
   public void process(Document document) throws BiomedicusException {
-    TextView view = document.getTextView(viewName)
-        .orElseThrow(() -> new BiomedicusException("View not found: " + viewName));
+    LabeledText view = document.getLabeledTexts().get(viewName);
 
-    LabelIndex<Sentence> sentences = view.getLabelIndex(Sentence.class);
-    LabelIndex<ParseToken> parseTokenLabelIndex = view.getLabelIndex(ParseToken.class);
-    LabelIndex<PosTag> partOfSpeechLabelIndex = view.getLabelIndex(PosTag.class);
-    Labeler<ConstituencyParse> labeler = view.getLabeler(ConstituencyParse.class);
+    if (view == null) {
+      throw new BiomedicusException("View not found: " + viewName);
+    }
+
+    LabelIndex<Sentence> sentences = view.labelIndex(Sentence.class);
+    LabelIndex<ParseToken> parseTokenLabelIndex = view.labelIndex(ParseToken.class);
+    LabelIndex<PosTag> partOfSpeechLabelIndex = view.labelIndex(PosTag.class);
+    Labeler<ConstituencyParse> labeler = view.labeler(ConstituencyParse.class);
 
     for (Sentence sentence : sentences) {
       stanfordConstituencyParserModel.parseSentence(sentence, parseTokenLabelIndex,
