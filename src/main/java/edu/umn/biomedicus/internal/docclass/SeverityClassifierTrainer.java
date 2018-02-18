@@ -20,11 +20,10 @@ package edu.umn.biomedicus.internal.docclass;
 import com.google.inject.Inject;
 import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
-import edu.umn.biomedicus.common.TextIdentifiers;
-import edu.umn.biomedicus.exc.BiomedicusException;
-import edu.umn.biomedicus.framework.Aggregator;
+import edu.umn.biomedicus.common.DocumentIdentifiers;
+import edu.umn.nlpengine.Aggregator;
+import edu.umn.nlpengine.Artifact;
 import edu.umn.nlpengine.Document;
-import edu.umn.nlpengine.LabeledText;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -33,6 +32,7 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import weka.attributeSelection.ASEvaluation;
@@ -68,10 +68,12 @@ public class SeverityClassifierTrainer implements Aggregator {
    * @param stopWordsPath path to a stopwords file
    */
   @Inject
-  public SeverityClassifierTrainer(@ProcessorSetting("docclass.severity.output.path") Path outPath,
+  public SeverityClassifierTrainer(
+      @ProcessorSetting("docclass.severity.output.path") Path outPath,
       @ProcessorSetting("docclass.stopwords.path") @Nullable Path stopWordsPath,
       @ProcessorSetting("docclass.severity.attributesToKeep") Integer attributesToKeep,
-      @ProcessorSetting("docclass.severity.minWordCount") Integer minWordCount) {
+      @ProcessorSetting("docclass.severity.minWordCount") Integer minWordCount
+  ) {
     Set<String> stopWords = null;
     if (stopWordsPath != null) {
       try {
@@ -86,18 +88,7 @@ public class SeverityClassifierTrainer implements Aggregator {
   }
 
   @Override
-  public void addDocument(Document document) throws BiomedicusException {
-    LabeledText labeledText = document.getLabeledTexts().get(TextIdentifiers.ORIGINAL_DOCUMENT);
-
-    if (labeledText == null) {
-      throw new BiomedicusException("Missing original document view");
-    }
-
-    wekaProcessor.addTrainingDocument(labeledText);
-  }
-
-  @Override
-  public void done() throws BiomedicusException {
+  public void done() {
     Instances trainSet = wekaProcessor.getTrainingData();
     Classifier classifier = new SMO();
     AttributeSelection sel = new AttributeSelection();
@@ -118,7 +109,7 @@ public class SeverityClassifierTrainer implements Aggregator {
       trainSet = Filter.useFilter(trainSet, remove);
       classifier.buildClassifier(trainSet);
     } catch (Exception e) {
-      throw new BiomedicusException();
+      throw new RuntimeException(e);
     }
 
     SeverityClassifierModel model = new SeverityClassifierModel(classifier, remove, wekaProcessor);
@@ -128,7 +119,18 @@ public class SeverityClassifierTrainer implements Aggregator {
       oos.writeObject(model);
       oos.close();
     } catch (IOException e) {
-      throw new BiomedicusException();
+      throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public void process(@NotNull Artifact artifact) {
+    Document document = artifact.getDocuments().get(DocumentIdentifiers.ORIGINAL_DOCUMENT);
+
+    if (document == null) {
+      throw new IllegalStateException("Missing original document view");
+    }
+
+    wekaProcessor.addTrainingDocument(document);
   }
 }

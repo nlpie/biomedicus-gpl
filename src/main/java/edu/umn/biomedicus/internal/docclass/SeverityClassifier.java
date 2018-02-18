@@ -18,11 +18,9 @@
 package edu.umn.biomedicus.internal.docclass;
 
 import com.google.inject.Inject;
-import edu.umn.biomedicus.common.TextIdentifiers;
-import edu.umn.biomedicus.exc.BiomedicusException;
-import edu.umn.biomedicus.framework.DocumentProcessor;
 import edu.umn.nlpengine.Document;
-import edu.umn.nlpengine.LabeledText;
+import edu.umn.nlpengine.DocumentProcessor;
+import org.jetbrains.annotations.NotNull;
 
 public class SeverityClassifier implements DocumentProcessor {
 
@@ -34,9 +32,8 @@ public class SeverityClassifier implements DocumentProcessor {
   }
 
   @Override
-  public void process(Document document) throws BiomedicusException {
-    LabeledText system = TextIdentifiers.getSystemLabeledText(document);
-    String prediction = severityClassifierModel.predict(system);
+  public void process(@NotNull Document document) {
+    String prediction = severityClassifierModel.predict(document);
     document.getMetadata().put("Severity", prediction);
   }
 }

@@ -21,7 +21,7 @@
   <primitive>true</primitive>
   <!-- Do not change this -->
   <annotatorImplementationName>
-    edu.umn.biomedicus.uima.adapter.DocumentProcessorUimaAdapter
+    edu.umn.biomedicus.uima.adapter.ProcessorUimaAdapter
   </annotatorImplementationName>
   <!-- Biomedicus document processors are all run using DocumentProcessorUimaAdapter -->
   <analysisEngineMetaData>
@@ -43,7 +43,7 @@
         <mandatory>false</mandatory>
       </configurationParameter>
       <configurationParameter>
-        <name>documentProcessor</name>
+        <name>processorClass</name>
         <description>The document processor class to instantiate.</description>
         <type>String</type>
         <mandatory>true</mandatory>
@@ -101,7 +101,7 @@
         </value>
       </nameValuePair>
       <nameValuePair>
-        <name>documentProcessor</name>
+        <name>processorClass</name>
         <value>
           <string>edu.umn.biomedicus.internal.docclass.SeverityTrainerProcessor</string>
         </value>

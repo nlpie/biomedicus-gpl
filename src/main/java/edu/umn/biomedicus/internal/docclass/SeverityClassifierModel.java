@@ -23,7 +23,7 @@ import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
 import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DataLoader;
-import edu.umn.nlpengine.LabeledText;
+import edu.umn.nlpengine.Document;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -60,9 +60,11 @@ public class SeverityClassifierModel implements Serializable {
    * @param severityWekaProcessor a processor to convert Document objects into Weka Instance
    * objects
    */
-  SeverityClassifierModel(Classifier classifier,
+  SeverityClassifierModel(
+      Classifier classifier,
       Filter attSel,
-      SeverityWekaProcessor severityWekaProcessor) throws BiomedicusException {
+      SeverityWekaProcessor severityWekaProcessor
+  ) {
     severityMap = new HashMap<>();
     severityMap.put(0., "ABSENT");
     severityMap.put(1., "MILD");
@@ -78,11 +80,11 @@ public class SeverityClassifierModel implements Serializable {
    * Perform attribute selection and then classification using the stored Weka objects
    * Where classes are tied, err on the side of higher class
    *
-   * @param labeledText the text
+   * @param document the text
    * @return a string (from the predefined classes) representing this text's symptom severity
    */
-  public String predict(LabeledText labeledText) throws BiomedicusException {
-    Instance inst = severityWekaProcessor.getTestData(labeledText);
+  public String predict(Document document) {
+    Instance inst = severityWekaProcessor.getTestData(document);
     double result;
     try {
       if (attSel.input(inst)) {
@@ -97,10 +99,10 @@ public class SeverityClassifierModel implements Serializable {
           }
         }
       } else {
-        throw new Exception();
+        throw new RuntimeException();
       }
     } catch (Exception e) {
-      throw new BiomedicusException();
+      throw new RuntimeException(e);
     }
     return severityMap.get(result);
   }
