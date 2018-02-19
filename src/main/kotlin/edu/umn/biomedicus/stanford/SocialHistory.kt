@@ -17,9 +17,6 @@
 
 package edu.umn.biomedicus.stanford
 
-import edu.umn.biomedicus.annotations.ProcessorSetting
-import edu.umn.biomedicus.exc.BiomedicusException
-import edu.umn.biomedicus.framework.DocumentProcessor
 import edu.umn.biomedicus.gpl.stanford.parser.StanfordConstituencyParserModel
 import edu.umn.biomedicus.gpl.stanford.parser.StanfordDependencyParserModel
 import edu.umn.biomedicus.parsing.ConstituencyParse
@@ -29,25 +26,23 @@ import edu.umn.biomedicus.sh.NicotineCandidate
 import edu.umn.biomedicus.tagging.PosTag
 import edu.umn.biomedicus.tokenization.ParseToken
 import edu.umn.nlpengine.Document
+import edu.umn.nlpengine.DocumentProcessor
 import javax.inject.Inject
 
 class SHParser @Inject constructor(
         private val stanfordConstituencyParserModel: StanfordConstituencyParserModel,
-        private val stanfordDependencyParserModel: StanfordDependencyParserModel,
-        @ProcessorSetting("viewName") val viewName: String
+        private val stanfordDependencyParserModel: StanfordDependencyParserModel
 ) : DocumentProcessor {
     override fun process(document: Document) {
-        val view = document.labeledTexts[viewName] ?: throw BiomedicusException("View not found: " + viewName)
+        val sentences = document.labelIndex<Sentence>()
 
-        val sentences = view.labelIndex(Sentence::class)
+        val parseTokens = document.labelIndex<ParseToken>()
+        val posTags = document.labelIndex<PosTag>()
 
-        val parseTokens = view.labelIndex(ParseToken::class)
-        val posTags = view.labelIndex(PosTag::class)
+        val smokingCandidates = document.labelIndex<NicotineCandidate>()
 
-        val smokingCandidates = view.labelIndex(NicotineCandidate::class)
-
-        val dependencyParseLabeler = view.labeler(DependencyParse::class)
-        val constituencyParseLabeler = view.labeler(ConstituencyParse::class)
+        val dependencyParseLabeler = document.labeler<DependencyParse>()
+        val constituencyParseLabeler = document.labeler<ConstituencyParse>()
 
         for (sentence in sentences) {
             if (smokingCandidates.containsSpan(sentence)) {

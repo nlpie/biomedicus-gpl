@@ -21,7 +21,7 @@
   <primitive>true</primitive>
   <!-- Do not change this -->
   <annotatorImplementationName>
-    edu.umn.biomedicus.uima.adapter.DocumentProcessorUimaAdapter
+    edu.umn.biomedicus.uima.adapter.ProcessorUimaAdapter
   </annotatorImplementationName>
   <!-- Biomedicus document processors are all run using DocumentProcessorUimaAdapter -->
   <analysisEngineMetaData>
@@ -31,13 +31,13 @@
     <vendor>${organization.name}</vendor>
     <configurationParameters>
       <configurationParameter>
-        <name>documentProcessor</name>
+        <name>processorClass</name>
         <description>The document processor class to instantiate.</description>
         <type>String</type>
         <mandatory>true</mandatory>
       </configurationParameter>
       <configurationParameter>
-        <name>viewName</name>
+        <name>documentName</name>
         <description>The name of the UIMA view to use.</description>
         <type>String</type>
       </configurationParameter>
@@ -65,13 +65,13 @@
     </configurationParameters>
     <configurationParameterSettings>
       <nameValuePair>
-        <name>documentProcessor</name>
+        <name>processorClass</name>
         <value>
           <string>edu.umn.biomedicus.internal.docclass.SeverityClassifier</string>
         </value>
       </nameValuePair>
       <nameValuePair>
-        <name>viewName</name>
+        <name>documentName</name>
         <value>
           <string>System</string>
         </value>

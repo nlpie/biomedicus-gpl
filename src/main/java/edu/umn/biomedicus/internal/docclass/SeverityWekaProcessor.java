@@ -17,7 +17,7 @@
 
 package edu.umn.biomedicus.internal.docclass;
 
-import edu.umn.nlpengine.LabeledText;
+import edu.umn.nlpengine.Document;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,10 +110,10 @@ class SeverityWekaProcessor implements Serializable {
    * Add a document for training. Will extract this doc's text but will not train on it until
    * getTrainingData called
    *
-   * @param labeledText a document
+   * @param document a document
    */
-  void addTrainingDocument(LabeledText labeledText) {
-    Instance trainingInstance = getTextInstance(labeledText.getText());
+  void addTrainingDocument(Document document) {
+    Instance trainingInstance = getTextInstance(document.getText());
     if (trainingInstance != null) {
       trainingTextInstances.add(trainingInstance);
     }
@@ -122,11 +122,11 @@ class SeverityWekaProcessor implements Serializable {
   /**
    * Convert a document into a vector instance. buildDictionary() needs to have been run.
    *
-   * @param labeledText a document
+   * @param document a document
    * @return an Instance with real-valued data
    */
-  Instance getTestData(LabeledText labeledText) {
-    Instance textInstance = getTextInstance(labeledText.getText());
+  Instance getTestData(Document document) {
+    Instance textInstance = getTextInstance(document.getText());
     Instance vectorInstance = vectorizeInstance(textInstance);
     vectorInstance.setDataset(vectorTemplate);
     return vectorInstance;

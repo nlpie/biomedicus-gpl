@@ -17,45 +17,34 @@
 
 package edu.umn.biomedicus.gpl.stanford.parser;
 
-import edu.umn.biomedicus.annotations.ProcessorSetting;
-import edu.umn.biomedicus.exc.BiomedicusException;
-import edu.umn.biomedicus.framework.DocumentProcessor;
-import edu.umn.nlpengine.Document;
-import edu.umn.nlpengine.LabeledText;
 import edu.umn.biomedicus.parsing.ConstituencyParse;
 import edu.umn.biomedicus.sentences.Sentence;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
+import edu.umn.nlpengine.Document;
+import edu.umn.nlpengine.DocumentProcessor;
 import edu.umn.nlpengine.LabelIndex;
 import edu.umn.nlpengine.Labeler;
 import javax.inject.Inject;
+import org.jetbrains.annotations.NotNull;
 
 public class StanfordConstituencyParser implements DocumentProcessor {
 
   private final StanfordConstituencyParserModel stanfordConstituencyParserModel;
-  private final String viewName;
 
   @Inject
   public StanfordConstituencyParser(
-      StanfordConstituencyParserModel stanfordConstituencyParserModel,
-      @ProcessorSetting("viewName") String viewName
+      StanfordConstituencyParserModel stanfordConstituencyParserModel
   ) {
     this.stanfordConstituencyParserModel = stanfordConstituencyParserModel;
-    this.viewName = viewName;
   }
 
   @Override
-  public void process(Document document) throws BiomedicusException {
-    LabeledText view = document.getLabeledTexts().get(viewName);
-
-    if (view == null) {
-      throw new BiomedicusException("View not found: " + viewName);
-    }
-
-    LabelIndex<Sentence> sentences = view.labelIndex(Sentence.class);
-    LabelIndex<ParseToken> parseTokenLabelIndex = view.labelIndex(ParseToken.class);
-    LabelIndex<PosTag> partOfSpeechLabelIndex = view.labelIndex(PosTag.class);
-    Labeler<ConstituencyParse> labeler = view.labeler(ConstituencyParse.class);
+  public void process(@NotNull Document document) {
+    LabelIndex<Sentence> sentences = document.labelIndex(Sentence.class);
+    LabelIndex<ParseToken> parseTokenLabelIndex = document.labelIndex(ParseToken.class);
+    LabelIndex<PosTag> partOfSpeechLabelIndex = document.labelIndex(PosTag.class);
+    Labeler<ConstituencyParse> labeler = document.labeler(ConstituencyParse.class);
 
     for (Sentence sentence : sentences) {
       stanfordConstituencyParserModel.parseSentence(sentence, parseTokenLabelIndex,
