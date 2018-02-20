@@ -39,7 +39,7 @@
       </configurationParameter>
       <configurationParameter>
         <name>documentName</name>
-        <description>The name of the UIMA view to use.</description>
+        <description>The name of the document to process.</description>
         <type>String</type>
       </configurationParameter>
       <configurationParameter>
@@ -74,7 +74,7 @@
       <nameValuePair>
         <name>documentName</name>
         <value>
-          <string>System</string>
+          <string>Analysis</string>
         </value>
       </nameValuePair>
       <nameValuePair>
