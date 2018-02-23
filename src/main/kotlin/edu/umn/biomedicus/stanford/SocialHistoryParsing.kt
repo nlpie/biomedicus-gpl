@@ -17,45 +17,49 @@
 
 package edu.umn.biomedicus.stanford
 
-import edu.umn.biomedicus.gpl.stanford.parser.StanfordConstituencyParserModel
 import edu.umn.biomedicus.gpl.stanford.parser.StanfordDependencyParserModel
-import edu.umn.biomedicus.parsing.ConstituencyParse
+import edu.umn.biomedicus.parsing.Dependency
 import edu.umn.biomedicus.parsing.DependencyParse
-import edu.umn.biomedicus.sentences.Sentence
+import edu.umn.biomedicus.sentences
 import edu.umn.biomedicus.sh.NicotineCandidate
 import edu.umn.biomedicus.tagging.PosTag
-import edu.umn.biomedicus.tokenization.ParseToken
+import edu.umn.biomedicus.tokens
 import edu.umn.nlpengine.Document
 import edu.umn.nlpengine.DocumentProcessor
 import javax.inject.Inject
 
 class SHParser @Inject constructor(
-        private val stanfordConstituencyParserModel: StanfordConstituencyParserModel,
         private val stanfordDependencyParserModel: StanfordDependencyParserModel
 ) : DocumentProcessor {
     override fun process(document: Document) {
-        val sentences = document.labelIndex<Sentence>()
+        val sentences = document.sentences()
 
-        val parseTokens = document.labelIndex<ParseToken>()
+        val parseTokens = document.tokens()
         val posTags = document.labelIndex<PosTag>()
 
         val smokingCandidates = document.labelIndex<NicotineCandidate>()
 
+        val dependencyLabeler = document.labeler<Dependency>()
         val dependencyParseLabeler = document.labeler<DependencyParse>()
-        val constituencyParseLabeler = document.labeler<ConstituencyParse>()
 
-        for (sentence in sentences) {
-            if (smokingCandidates.containsSpan(sentence)) {
-                stanfordConstituencyParserModel.parseSentence(sentence, parseTokens, posTags,
-                        constituencyParseLabeler)
-                dependencyParseLabeler.add(DependencyParse(
-                        sentence,
-                        stanfordDependencyParserModel.parseSentence(
-                                parseTokens.insideSpan(sentence).asList(),
-                                posTags.insideSpan(sentence).asList()
-                        )
-                ))
-            }
-        }
+        sentences
+                .filter {
+                    smokingCandidates.containsSpan(it)
+                }
+                .forEach {
+                    val sentenceTokens = parseTokens.insideSpan(it).asList()
+                    val sentenceTags = posTags.insideSpan(it).asList()
+
+                    val grammaticalStructure = stanfordDependencyParserModel
+                            .parseToGrammaticalStructure(sentenceTokens, sentenceTags)
+
+                    labelDependencyParse(
+                            grammaticalStructure = grammaticalStructure,
+                            sentence = it,
+                            tokens = sentenceTokens,
+                            dependencyLabeler = dependencyLabeler,
+                            rootLabeler = dependencyParseLabeler
+                    )
+                }
     }
 }

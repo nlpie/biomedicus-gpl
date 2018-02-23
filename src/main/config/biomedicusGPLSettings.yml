@@ -7,5 +7,5 @@ settings:
       attributesToKeep: 1000
       minWordCount: 2
   stanford:
-    srParser.path: stanford/englishSR.ser.gz
-    depParserPath: stanford/english_SD.gz
+    srParser.path: stanford/englishSR.beam.ser.gz
+    depParserPath: stanford/english_UD.gz

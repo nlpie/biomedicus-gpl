@@ -17,14 +17,18 @@
 
 package edu.umn.biomedicus.gpl.stanford.parser;
 
+import edu.stanford.nlp.trees.GrammaticalStructure;
+import edu.umn.biomedicus.parsing.Dependency;
 import edu.umn.biomedicus.parsing.DependencyParse;
 import edu.umn.biomedicus.sentences.Sentence;
+import edu.umn.biomedicus.stanford.ParseConversionKt;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
 import edu.umn.nlpengine.Document;
 import edu.umn.nlpengine.DocumentProcessor;
 import edu.umn.nlpengine.LabelIndex;
 import edu.umn.nlpengine.Labeler;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
@@ -44,13 +48,18 @@ public class StanfordDependencyParser implements DocumentProcessor {
     LabelIndex<ParseToken> tokens = document.labelIndex(ParseToken.class);
     LabelIndex<PosTag> posTags = document.labelIndex(PosTag.class);
     Labeler<DependencyParse> labeler = document.labeler(DependencyParse.class);
+    Labeler<Dependency> dependencyLabeler = document.labeler(Dependency.class);
 
     for (Sentence sentence : sentences) {
-      String parse = model.parseSentence(
-          tokens.insideSpan(sentence).asList(),
+      List<ParseToken> sentenceTokens = tokens.insideSpan(sentence).asList();
+      GrammaticalStructure grammaticalStructure = model.parseToGrammaticalStructure(
+          sentenceTokens,
           posTags.insideSpan(sentence).asList()
       );
-      labeler.add(new DependencyParse(sentence, parse));
+
+      ParseConversionKt
+          .labelDependencyParse(grammaticalStructure, sentence, sentenceTokens, dependencyLabeler,
+              labeler);
     }
   }
 }

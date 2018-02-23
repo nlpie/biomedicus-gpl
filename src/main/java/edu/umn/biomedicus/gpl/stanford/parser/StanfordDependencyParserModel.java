@@ -46,6 +46,14 @@ public class StanfordDependencyParserModel {
       List<ParseToken> tokens,
       List<PosTag> posTags
   ) {
+    GrammaticalStructure structure = parseToGrammaticalStructure(tokens, posTags);
+    return structure.typedDependencies().toString();
+  }
+
+  public GrammaticalStructure parseToGrammaticalStructure(
+      List<ParseToken> tokens,
+      List<PosTag> posTags
+  ) {
     int size = tokens.size();
     List<TaggedWord> taggedWordList = new ArrayList<>(size);
     for (int i = 0; i < size; i++) {
@@ -55,8 +63,7 @@ public class StanfordDependencyParserModel {
           PartsOfSpeech.tagForPartOfSpeech(posTag.getPartOfSpeech()));
       taggedWordList.add(taggedWord);
     }
-    GrammaticalStructure structure = parser.predict(taggedWordList);
-    return structure.typedDependencies().toString();
+    return parser.predict(taggedWordList);
   }
 
   @Singleton

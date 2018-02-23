@@ -26,12 +26,16 @@
   <!-- Biomedicus document processors are all run using DocumentProcessorUimaAdapter -->
   <analysisEngineMetaData>
     <name>Social History Parser</name>
-    <description>
-      Uses Stanford's constituency parser and dependency parser on social history candidates.
-    </description>
+    <description>Performs parsing for the Social History module in BioMedICUS</description>
     <version>${project.version}</version>
     <vendor>${organization.name}</vendor>
     <configurationParameters>
+      <configurationParameter>
+        <name>documentName</name>
+        <description>The name of the document to run this processor on.</description>
+        <type>String</type>
+        <mandatory>true</mandatory>
+      </configurationParameter>
       <configurationParameter>
         <name>processorClass</name>
         <description>The document processor class to instantiate.</description>
@@ -39,16 +43,12 @@
         <mandatory>true</mandatory>
       </configurationParameter>
       <configurationParameter>
-        <name>documentName</name>
-        <description>The name of the document to process.</description>
-        <type>String</type>
-      </configurationParameter>
-      <configurationParameter>
         <name>eagerLoad</name>
         <description>
-          The name of any classes that need to be eagerly loaded by the Guice injector. Classes
-          which are
-          instances of LoadableDataModel will have the loadData method called.
+          The name of any classes that need to be eagerly loaded by
+          the Guice injector. Classes which are
+          instances of LoadableDataModel will have the loadData method
+          called.
         </description>
         <type>String</type>
         <multiValued>true</multiValued>
@@ -57,8 +57,8 @@
       <configurationParameter>
         <name>postProcessors</name>
         <description>
-          The class names of any post processors that should be run after all documents have been
-          processed.
+          The class names of any post processors that should be run
+          after all documents have been processed.
         </description>
         <type>String</type>
         <multiValued>true</multiValued>
@@ -82,7 +82,6 @@
         <name>eagerLoad</name>
         <value>
           <array>
-            <string>edu.umn.biomedicus.gpl.stanford.parser.StanfordConstituencyParserModel</string>
             <string>edu.umn.biomedicus.gpl.stanford.parser.StanfordDependencyParserModel</string>
           </array>
         </value>
@@ -98,6 +97,11 @@
         <import name="edu.umn.biomedicus.types.TypeSystemTypePriorities"/>
       </imports>
     </typePriorities>
+    <fsIndexCollection>
+      <imports>
+        <import name="edu.umn.biomedicus.types.IndexCollection"/>
+      </imports>
+    </fsIndexCollection>
     <operationalProperties>
       <modifiesCas>true</modifiesCas>
       <multipleDeploymentAllowed>true</multipleDeploymentAllowed>
@@ -118,7 +122,9 @@
         <name>guiceInjector</name>
         <description>The guice resource.</description>
         <customResourceSpecifier>
-          <resourceClassName>edu.umn.biomedicus.uima.adapter.GuiceInjector</resourceClassName>
+          <resourceClassName>
+            edu.umn.biomedicus.uima.adapter.GuiceInjector
+          </resourceClassName>
         </customResourceSpecifier>
       </externalResource>
     </externalResources>
