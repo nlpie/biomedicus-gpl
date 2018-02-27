@@ -21,6 +21,8 @@ import edu.umn.biomedicus.gpl.stanford.parser.StanfordDependencyParserModel
 import edu.umn.biomedicus.parsing.Dependency
 import edu.umn.biomedicus.parsing.DependencyParse
 import edu.umn.biomedicus.sentences
+import edu.umn.biomedicus.sh.AlcoholCandidate
+import edu.umn.biomedicus.sh.DrugCandidate
 import edu.umn.biomedicus.sh.NicotineCandidate
 import edu.umn.biomedicus.tagging.PosTag
 import edu.umn.biomedicus.tokens
@@ -37,14 +39,17 @@ class SHParser @Inject constructor(
         val parseTokens = document.tokens()
         val posTags = document.labelIndex<PosTag>()
 
-        val smokingCandidates = document.labelIndex<NicotineCandidate>()
+        val alcoholCandidates = document.labelIndex<AlcoholCandidate>()
+        val drugCandidates = document.labelIndex<DrugCandidate>()
+        val nicotineCandidates = document.labelIndex<NicotineCandidate>()
 
         val dependencyLabeler = document.labeler<Dependency>()
         val dependencyParseLabeler = document.labeler<DependencyParse>()
 
         sentences
                 .filter {
-                    smokingCandidates.containsSpan(it)
+                    alcoholCandidates.containsSpan(it) || drugCandidates.containsSpan(it)
+                            || nicotineCandidates.containsSpan(it)
                 }
                 .forEach {
                     val sentenceTokens = parseTokens.insideSpan(it).asList()
