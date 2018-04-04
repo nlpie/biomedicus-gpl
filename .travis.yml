@@ -1,0 +1,15 @@
+language: java
+jdk:
+- oraclejdk8
+branches:
+  only:
+  - master
+  - release
+cache:
+  directories:
+  - "$HOME/.m2"
+notifications:
+  slack:
+    secure: ucV5cdf3NyGkZ3jVuXI9XO6KlZ6rgu2GOjdhuGV7m/8Y2gyt0GH7q3Ob5R1EvfMmxQd4VldBKeyPllY0u0h44din60kVITlzZUm04t35wPlYUFmtCQfGCtjgAVqtB8IqV/3ibemgdKLvtIY6/5E5R8hiElMue2n1OwUwgSNZRNNLXkkXBTi2vT81RVaSTV9AK7zLgGnoZdFMIa/yPu5pAhwJ0oGxlpWYdB3gg2qZ1x7hYU1UYLlrg5gWSysjk+9C+dX8B91GRdp+Im16b7lhg3/Gdd9lY3BT6dyYKvvd0oHipilK5jDf0LLYWv5XJ2vUf/aw+wlbwziB8LuI+A4t0jhBo1/lEIUfN3ayznkyq+IcNiIQpfe2srH1RptFpq3lIllDwPPD54TDNyBdfMjNT7vtTc1W2hWPQIAiVUW/x3LBcQu6z2xy/BDXviBWC/ukWzMs6qCgwGGVO5/8onuEKP0VURIVDCx8ZmpYFMvt+nFuXxwXndiQopNRJ4AUbFx6rJD+LYE50mEAqtwhyoDVOIcOdWgyYuVGi9CuY2SuLUan4lBAXFdAI9WI+hDxsnuN3tLkFgVM4a79AJB5OQVi6RZ+Ivs2SjINdKthnBoDoHiVnARp4lEL2vD033O6bd5LcjgudXG5gZQcdO81Z5PFhsZfpy+YI7IdnH2TguKUccI=
+    on_success: change
+    on_failure: always
