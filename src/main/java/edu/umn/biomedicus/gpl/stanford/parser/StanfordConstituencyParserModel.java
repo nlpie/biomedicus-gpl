@@ -84,7 +84,7 @@ public class StanfordConstituencyParserModel {
     }
 
     @Override
-    protected StanfordConstituencyParserModel loadModel() throws BiomedicusException {
+    protected StanfordConstituencyParserModel loadModel() {
       ShiftReduceParser shiftReduceParser = ShiftReduceParser.loadModel(path.toString());
       return new StanfordConstituencyParserModel(shiftReduceParser);
     }
