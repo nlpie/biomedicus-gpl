@@ -25,7 +25,7 @@ import edu.umn.biomedicus.stanford.ParseConversionKt;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
 import edu.umn.nlpengine.Document;
-import edu.umn.nlpengine.DocumentProcessor;
+import edu.umn.nlpengine.DocumentOperation;
 import edu.umn.nlpengine.LabelIndex;
 import edu.umn.nlpengine.Labeler;
 import java.util.List;
@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
 
-public class StanfordDependencyParser implements DocumentProcessor {
+public class StanfordDependencyParser implements DocumentOperation {
 
   private final StanfordDependencyParserModel model;
 
@@ -51,10 +51,10 @@ public class StanfordDependencyParser implements DocumentProcessor {
     Labeler<Dependency> dependencyLabeler = document.labeler(Dependency.class);
 
     for (Sentence sentence : sentences) {
-      List<ParseToken> sentenceTokens = tokens.insideSpan(sentence).asList();
+      List<ParseToken> sentenceTokens = tokens.inside(sentence).asList();
       GrammaticalStructure grammaticalStructure = model.parseToGrammaticalStructure(
           sentenceTokens,
-          posTags.insideSpan(sentence).asList()
+          posTags.inside(sentence).asList()
       );
 
       ParseConversionKt

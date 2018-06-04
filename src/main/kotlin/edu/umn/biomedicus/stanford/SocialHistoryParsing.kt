@@ -27,12 +27,14 @@ import edu.umn.biomedicus.sh.NicotineCandidate
 import edu.umn.biomedicus.tagging.PosTag
 import edu.umn.biomedicus.tokens
 import edu.umn.nlpengine.Document
-import edu.umn.nlpengine.DocumentProcessor
+import edu.umn.nlpengine.DocumentOperation
+import edu.umn.nlpengine.labelIndex
+import edu.umn.nlpengine.labeler
 import javax.inject.Inject
 
 class SHParser @Inject constructor(
         private val stanfordDependencyParserModel: StanfordDependencyParserModel
-) : DocumentProcessor {
+) : DocumentOperation {
     override fun process(document: Document) {
         val sentences = document.sentences()
 
@@ -52,8 +54,8 @@ class SHParser @Inject constructor(
                             || nicotineCandidates.containsSpan(it)
                 }
                 .forEach {
-                    val sentenceTokens = parseTokens.insideSpan(it).asList()
-                    val sentenceTags = posTags.insideSpan(it).asList()
+                    val sentenceTokens = parseTokens.inside(it).asList()
+                    val sentenceTags = posTags.inside(it).asList()
 
                     val grammaticalStructure = stanfordDependencyParserModel
                             .parseToGrammaticalStructure(sentenceTokens, sentenceTags)

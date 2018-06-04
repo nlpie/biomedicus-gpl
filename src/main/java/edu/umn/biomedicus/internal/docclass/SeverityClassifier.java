@@ -19,10 +19,10 @@ package edu.umn.biomedicus.internal.docclass;
 
 import com.google.inject.Inject;
 import edu.umn.nlpengine.Document;
-import edu.umn.nlpengine.DocumentProcessor;
+import edu.umn.nlpengine.DocumentOperation;
 import org.jetbrains.annotations.NotNull;
 
-public class SeverityClassifier implements DocumentProcessor {
+public class SeverityClassifier implements DocumentOperation {
 
   private final SeverityClassifierModel severityClassifierModel;
 

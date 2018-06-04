@@ -25,7 +25,6 @@ import edu.stanford.nlp.trees.Tree;
 import edu.umn.biomedicus.annotations.Setting;
 import edu.umn.biomedicus.common.types.syntax.PartOfSpeech;
 import edu.umn.biomedicus.common.types.syntax.PartsOfSpeech;
-import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DataLoader;
 import edu.umn.biomedicus.parsing.ConstituencyParse;
 import edu.umn.biomedicus.tagging.PosTag;
@@ -57,7 +56,7 @@ public class StanfordConstituencyParserModel {
       Labeler<ConstituencyParse> constituencyParseLabeler
   ) {
     List<TaggedWord> taggedWordList = new ArrayList<>();
-    for (ParseToken parseTokenLabel : parseTokenLabelIndex.insideSpan(sentenceLabel)) {
+    for (ParseToken parseTokenLabel : parseTokenLabelIndex.inside(sentenceLabel)) {
       String word = parseTokenLabel.getText();
       PartOfSpeech partOfSpeech = partOfSpeechLabelIndex.firstAtLocation(parseTokenLabel)
           .getPartOfSpeech();

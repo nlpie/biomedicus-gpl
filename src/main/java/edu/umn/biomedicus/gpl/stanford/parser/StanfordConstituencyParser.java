@@ -22,13 +22,13 @@ import edu.umn.biomedicus.sentences.Sentence;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
 import edu.umn.nlpengine.Document;
-import edu.umn.nlpengine.DocumentProcessor;
+import edu.umn.nlpengine.DocumentOperation;
 import edu.umn.nlpengine.LabelIndex;
 import edu.umn.nlpengine.Labeler;
 import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
 
-public class StanfordConstituencyParser implements DocumentProcessor {
+public class StanfordConstituencyParser implements DocumentOperation {
 
   private final StanfordConstituencyParserModel stanfordConstituencyParserModel;
 

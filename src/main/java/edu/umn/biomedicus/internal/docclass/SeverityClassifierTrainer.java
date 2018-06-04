@@ -21,7 +21,7 @@ import com.google.inject.Inject;
 import edu.umn.biomedicus.annotations.ProcessorScoped;
 import edu.umn.biomedicus.annotations.ProcessorSetting;
 import edu.umn.biomedicus.common.DocumentIdentifiers;
-import edu.umn.nlpengine.Aggregator;
+import edu.umn.nlpengine.ArtifactProcessor;
 import edu.umn.nlpengine.Artifact;
 import edu.umn.nlpengine.Document;
 import java.io.FileOutputStream;
@@ -52,7 +52,7 @@ import weka.filters.unsupervised.attribute.Remove;
  * @author Greg Finley
  */
 @ProcessorScoped
-public class SeverityClassifierTrainer implements Aggregator {
+public class SeverityClassifierTrainer implements ArtifactProcessor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SeverityClassifierTrainer.class);
 
