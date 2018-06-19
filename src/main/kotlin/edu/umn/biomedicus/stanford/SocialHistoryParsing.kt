@@ -27,15 +27,15 @@ import edu.umn.biomedicus.sh.NicotineCandidate
 import edu.umn.biomedicus.tagging.PosTag
 import edu.umn.biomedicus.tokens
 import edu.umn.nlpengine.Document
-import edu.umn.nlpengine.DocumentOperation
+import edu.umn.nlpengine.DocumentTask
 import edu.umn.nlpengine.labelIndex
 import edu.umn.nlpengine.labeler
 import javax.inject.Inject
 
-class SHParser @Inject constructor(
+class ParseSHCandidates @Inject constructor(
         private val stanfordDependencyParserModel: StanfordDependencyParserModel
-) : DocumentOperation {
-    override fun process(document: Document) {
+) : DocumentTask {
+    override fun run(document: Document) {
         val sentences = document.sentences()
 
         val parseTokens = document.tokens()

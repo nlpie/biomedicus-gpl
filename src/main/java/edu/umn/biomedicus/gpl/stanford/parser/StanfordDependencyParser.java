@@ -25,15 +25,14 @@ import edu.umn.biomedicus.stanford.ParseConversionKt;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
 import edu.umn.nlpengine.Document;
-import edu.umn.nlpengine.DocumentOperation;
+import edu.umn.nlpengine.DocumentTask;
 import edu.umn.nlpengine.LabelIndex;
 import edu.umn.nlpengine.Labeler;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.jetbrains.annotations.NotNull;
 
-public class StanfordDependencyParser implements DocumentOperation {
+public class StanfordDependencyParser implements DocumentTask {
 
   private final StanfordDependencyParserModel model;
 
@@ -43,7 +42,7 @@ public class StanfordDependencyParser implements DocumentOperation {
   }
 
   @Override
-  public void process(@NotNull @Nonnull Document document) {
+  public void run(@Nonnull Document document) {
     LabelIndex<Sentence> sentences = document.labelIndex(Sentence.class);
     LabelIndex<ParseToken> tokens = document.labelIndex(ParseToken.class);
     LabelIndex<PosTag> posTags = document.labelIndex(PosTag.class);

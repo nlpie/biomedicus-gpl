@@ -22,13 +22,13 @@ import edu.umn.biomedicus.sentences.Sentence;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
 import edu.umn.nlpengine.Document;
-import edu.umn.nlpengine.DocumentOperation;
+import edu.umn.nlpengine.DocumentTask;
 import edu.umn.nlpengine.LabelIndex;
 import edu.umn.nlpengine.Labeler;
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import org.jetbrains.annotations.NotNull;
 
-public class StanfordConstituencyParser implements DocumentOperation {
+public class StanfordConstituencyParser implements DocumentTask {
 
   private final StanfordConstituencyParserModel stanfordConstituencyParserModel;
 
@@ -40,7 +40,7 @@ public class StanfordConstituencyParser implements DocumentOperation {
   }
 
   @Override
-  public void process(@NotNull Document document) {
+  public void run(@Nonnull Document document) {
     LabelIndex<Sentence> sentences = document.labelIndex(Sentence.class);
     LabelIndex<ParseToken> parseTokenLabelIndex = document.labelIndex(ParseToken.class);
     LabelIndex<PosTag> partOfSpeechLabelIndex = document.labelIndex(PosTag.class);
