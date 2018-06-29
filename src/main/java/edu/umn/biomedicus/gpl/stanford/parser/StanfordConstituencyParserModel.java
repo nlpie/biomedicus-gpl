@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Regents of the University of Minnesota
+ * Copyright (C) 2018 Regents of the University of Minnesota
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,14 +25,13 @@ import edu.stanford.nlp.trees.Tree;
 import edu.umn.biomedicus.annotations.Setting;
 import edu.umn.biomedicus.common.types.syntax.PartOfSpeech;
 import edu.umn.biomedicus.common.types.syntax.PartsOfSpeech;
-import edu.umn.biomedicus.common.types.text.ConstituencyParse;
-import edu.umn.biomedicus.common.types.text.ImmutableConstituencyParse;
-import edu.umn.biomedicus.common.types.text.ParseToken;
-import edu.umn.biomedicus.exc.BiomedicusException;
 import edu.umn.biomedicus.framework.DataLoader;
-import edu.umn.biomedicus.framework.store.Label;
-import edu.umn.biomedicus.framework.store.LabelIndex;
-import edu.umn.biomedicus.framework.store.Labeler;
+import edu.umn.biomedicus.parsing.ConstituencyParse;
+import edu.umn.biomedicus.tagging.PosTag;
+import edu.umn.biomedicus.tokenization.ParseToken;
+import edu.umn.nlpengine.TextRange;
+import edu.umn.nlpengine.LabelIndex;
+import edu.umn.nlpengine.Labeler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
@@ -50,18 +49,17 @@ public class StanfordConstituencyParserModel {
     this.shiftReduceParser = shiftReduceParser;
   }
 
-  void parseSentence(
-      Label<?> sentenceLabel,
+  public void parseSentence(
+      TextRange sentenceLabel,
       LabelIndex<ParseToken> parseTokenLabelIndex,
-      LabelIndex<PartOfSpeech> partOfSpeechLabelIndex,
+      LabelIndex<PosTag> partOfSpeechLabelIndex,
       Labeler<ConstituencyParse> constituencyParseLabeler
-  ) throws BiomedicusException {
+  ) {
     List<TaggedWord> taggedWordList = new ArrayList<>();
-    for (Label<ParseToken> parseTokenLabel : parseTokenLabelIndex.insideSpan(sentenceLabel)) {
-      String word = parseTokenLabel.value().text();
-      PartOfSpeech partOfSpeech = partOfSpeechLabelIndex.withTextLocation(parseTokenLabel)
-          .orElseThrow(() -> new BiomedicusException("parse token did not have part of speech."))
-          .value();
+    for (ParseToken parseTokenLabel : parseTokenLabelIndex.inside(sentenceLabel)) {
+      String word = parseTokenLabel.getText();
+      PartOfSpeech partOfSpeech = partOfSpeechLabelIndex.firstAtLocation(parseTokenLabel)
+          .getPartOfSpeech();
 
       TaggedWord taggedWord = new TaggedWord(word, PartsOfSpeech.tagForPartOfSpeech(partOfSpeech));
       taggedWordList.add(taggedWord);
@@ -70,10 +68,8 @@ public class StanfordConstituencyParserModel {
     StringWriter stringWriter = new StringWriter();
     tree.pennPrint(new PrintWriter(stringWriter));
     String pennPrint = stringWriter.toString();
-    ConstituencyParse constituencyParse = ImmutableConstituencyParse.builder()
-        .parse(pennPrint)
-        .build();
-    constituencyParseLabeler.value(constituencyParse).label(sentenceLabel);
+    ConstituencyParse constituencyParse = new ConstituencyParse(sentenceLabel, pennPrint);
+    constituencyParseLabeler.add(constituencyParse);
   }
 
   @Singleton
@@ -87,7 +83,7 @@ public class StanfordConstituencyParserModel {
     }
 
     @Override
-    protected StanfordConstituencyParserModel loadModel() throws BiomedicusException {
+    protected StanfordConstituencyParserModel loadModel() {
       ShiftReduceParser shiftReduceParser = ShiftReduceParser.loadModel(path.toString());
       return new StanfordConstituencyParserModel(shiftReduceParser);
     }

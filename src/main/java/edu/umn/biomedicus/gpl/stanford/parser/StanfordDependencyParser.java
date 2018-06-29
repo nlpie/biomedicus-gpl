@@ -17,38 +17,48 @@
 
 package edu.umn.biomedicus.gpl.stanford.parser;
 
-import edu.umn.biomedicus.parsing.ConstituencyParse;
+import edu.stanford.nlp.trees.GrammaticalStructure;
+import edu.umn.biomedicus.parsing.Dependency;
+import edu.umn.biomedicus.parsing.DependencyParse;
 import edu.umn.biomedicus.sentences.Sentence;
+import edu.umn.biomedicus.stanford.ParseConversionKt;
 import edu.umn.biomedicus.tagging.PosTag;
 import edu.umn.biomedicus.tokenization.ParseToken;
 import edu.umn.nlpengine.Document;
 import edu.umn.nlpengine.DocumentTask;
 import edu.umn.nlpengine.LabelIndex;
 import edu.umn.nlpengine.Labeler;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
-public class StanfordConstituencyParser implements DocumentTask {
+public class StanfordDependencyParser implements DocumentTask {
 
-  private final StanfordConstituencyParserModel stanfordConstituencyParserModel;
+  private final StanfordDependencyParserModel model;
 
   @Inject
-  public StanfordConstituencyParser(
-      StanfordConstituencyParserModel stanfordConstituencyParserModel
-  ) {
-    this.stanfordConstituencyParserModel = stanfordConstituencyParserModel;
+  StanfordDependencyParser(StanfordDependencyParserModel model) {
+    this.model = model;
   }
 
   @Override
   public void run(@Nonnull Document document) {
     LabelIndex<Sentence> sentences = document.labelIndex(Sentence.class);
-    LabelIndex<ParseToken> parseTokenLabelIndex = document.labelIndex(ParseToken.class);
-    LabelIndex<PosTag> partOfSpeechLabelIndex = document.labelIndex(PosTag.class);
-    Labeler<ConstituencyParse> labeler = document.labeler(ConstituencyParse.class);
+    LabelIndex<ParseToken> tokens = document.labelIndex(ParseToken.class);
+    LabelIndex<PosTag> posTags = document.labelIndex(PosTag.class);
+    Labeler<DependencyParse> labeler = document.labeler(DependencyParse.class);
+    Labeler<Dependency> dependencyLabeler = document.labeler(Dependency.class);
 
     for (Sentence sentence : sentences) {
-      stanfordConstituencyParserModel.parseSentence(sentence, parseTokenLabelIndex,
-          partOfSpeechLabelIndex, labeler);
+      List<ParseToken> sentenceTokens = tokens.inside(sentence).asList();
+      GrammaticalStructure grammaticalStructure = model.parseToGrammaticalStructure(
+          sentenceTokens,
+          posTags.inside(sentence).asList()
+      );
+
+      ParseConversionKt
+          .labelDependencyParse(grammaticalStructure, sentence, sentenceTokens, dependencyLabeler,
+              labeler);
     }
   }
 }
