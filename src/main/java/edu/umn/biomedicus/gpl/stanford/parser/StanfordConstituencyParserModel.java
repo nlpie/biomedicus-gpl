@@ -78,7 +78,7 @@ public class StanfordConstituencyParserModel {
     private final Path path;
 
     @Inject
-    public Loader(@Setting("stanford.srParser.path") Path path) {
+    public Loader(@Setting("stanford.srParser.asDataPath") Path path) {
       this.path = path;
     }
 

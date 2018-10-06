@@ -71,7 +71,7 @@ public class StanfordDependencyParserModel {
     private final Path path;
 
     @Inject
-    public Loader(@Setting("stanford.depParserPath") Path path) {
+    public Loader(@Setting("stanford.depParser.asDataPath") Path path) {
       this.path = path;
     }
 

@@ -1,4 +1,4 @@
 settings:
   stanford:
-    srParser.path: stanford/englishSR.beam.ser.gz
-    depParserPath: stanford/english_UD.gz
+    srParser: stanford/englishSR.beam.ser.gz
+    depParser: stanford/english_UD.gz
