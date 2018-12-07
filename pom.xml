@@ -27,7 +27,7 @@
   <parent>
     <groupId>edu.umn.biomedicus</groupId>
     <artifactId>biomedicus-base-jdk8-kotlin</artifactId>
-    <version>1.0</version>
+    <version>1.2</version>
   </parent>
 
   <name>BioMedICUS GPL</name>
