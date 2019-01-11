@@ -22,7 +22,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>biomedicus-gpl</artifactId>
-  <version>2.1.0</version>
+  <version>2.2.0-SNAPSHOT</version>
 
   <parent>
     <groupId>edu.umn.biomedicus</groupId>
@@ -35,7 +35,7 @@
   <url>https://github.com/nlpie/biomedicus-gpl</url>
 
   <properties>
-    <biomedicus.version>2.1.0</biomedicus.version>
+    <biomedicus.version>2.2.0-SNAPSHOT</biomedicus.version>
   </properties>
 
   <build>
