@@ -1,3 +1,8 @@
+# Archived Project
+
+This project is no longer maintained. The main BioMedICUS project can be found at https://github.com/nlpie/biomedicus.
+
+
 Overview
 ========================================================================================================================
 
